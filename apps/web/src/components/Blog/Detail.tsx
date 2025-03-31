@@ -46,7 +46,8 @@ export function BlogDetail({ post }: { post: Post }) {
         alt={post.title}
         width={600}
         height={400}
-        style={{ objectFit: "cover", borderRadius: "8px" }}
+        style={{ width: "100%", height: "auto" }}
+        priority
       />
       <div
         data-test-id={`content-markdown`}

@@ -25,7 +25,8 @@ export function BlogListItem({ post }: { post: Post }) {
         alt={post.title} // Alt text for accessibility
         width={300} // Set the width of the image
         height={200} // Set the height of the image
-        style={{ objectFit: "cover" }} // Optional: Add styling for the image
+        style={{ objectFit: "cover", width: "300px", height: "200px" }} // Consistent styling
+        priority
       />
       <div>{post.description}</div>
       <div>{post.category}</div>
