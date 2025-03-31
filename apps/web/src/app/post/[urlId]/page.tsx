@@ -1,4 +1,7 @@
+import { BlogDetail } from "@/components/Blog/Detail";
 import { AppLayout } from "@/components/Layout/AppLayout";
+import { posts } from "@repo/db/data";
+import { parse, marked } from "marked";
 
 export default async function Page({
   params,
@@ -7,5 +10,27 @@ export default async function Page({
 }) {
   const { urlId } = await params;
 
-  return <AppLayout>Article not found</AppLayout>;
+  const post = posts.find((post) => { 
+    return post.urlId === urlId
+  });
+
+  if (!post) {
+    return (
+      <AppLayout>
+        <h1>Post not found</h1>
+        <p>The post you are looking for does not exist.</p>
+      </AppLayout>
+    );
+  }
+
+  // Process the markdown content on the server side
+  const processedContent = await marked(post.content, { async: true });
+
+  return (
+    <AppLayout>
+      <BlogDetail post={{...post, content: processedContent}} />
+      {/* <h1 data-test-id={`blog-post-${post.id}`}>{post.title}</h1>
+      <div dangerouslySetInnerHTML={{__html : parse(post.content)}}></div> */}
+    </AppLayout>
+  );
 }

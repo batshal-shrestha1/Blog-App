@@ -5,8 +5,9 @@ import { SummaryItem } from "./SummaryItem";
 
 export function CategoryList({ posts }: { posts: Post[] }) {
   // TODO: Implement proper category list
+  
   return (
-    <>
+    <ul>
       {categories(posts).map((item) => (
         <SummaryItem
           key={item.name}
@@ -17,6 +18,6 @@ export function CategoryList({ posts }: { posts: Post[] }) {
           title=""
         />
       ))}
-    </>
+    </ul>
   );
 }

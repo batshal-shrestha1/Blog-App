@@ -1,4 +1,26 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+    reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**", // Matches all paths under this hostname
+      },
+      {
+        protocol: "https",
+        hostname: "plus.unsplash.com",
+        pathname: "/**", // Matches all paths under this hostname
+      },
+      {
+        protocol: "https",
+        hostname: "m.media-amazon.com",
+        pathname: "/**", // Matches all paths under this hostname
+      },
+      
+    ],
+  },
+};
 
-export default nextConfig;
+export default nextConfig; // Correct way to export the configuration

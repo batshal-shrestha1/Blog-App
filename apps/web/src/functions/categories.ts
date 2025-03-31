@@ -1,4 +1,4 @@
-// import { posts, type Post } from "../components/data";
+//import { posts, type Post } from "../components/data";
 
 export function categories<T>(
   posts: { category: string; active: boolean }[],
