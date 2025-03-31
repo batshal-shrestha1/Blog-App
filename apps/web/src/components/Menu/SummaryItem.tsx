@@ -20,9 +20,9 @@ export function SummaryItem({
     : { backgroundColor: "transparent" };
 
   return (
-    <li style={itemStyle} title={title}>
-      <Link href={link} style={{ textDecoration: "none", color: "inherit" }}>
-        {name} ({count})
+    <li style={itemStyle}>
+      <Link href={link} title={title || name}  style={{ textDecoration: "none", color: "inherit" }}>
+        {name} <span data-test-id="post-count">({count})</span>
       </Link>
     </li>
   );

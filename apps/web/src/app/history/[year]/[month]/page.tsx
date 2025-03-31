@@ -1,14 +1,37 @@
 import { AppLayout } from "@/components/Layout/AppLayout";
 import { Main } from "@/components/Main";
+import { posts } from "@repo/db/data";
 
 export default async function Page({
   params,
 }: {
   params: Promise<{ year: string; month: string }>;
 }) {
+  const { year, month } = await params;
+
+  const filteredPosts = posts.filter((post) => {
+    const date = new Date(post.date);
+    return (
+      date.getFullYear() === parseInt(year) &&
+      date.getMonth() + 1 === parseInt(month)
+    );
+  });
+
+  console.log("Filtered Posts:", filteredPosts);
+
+  if (filteredPosts.length === 0) {
+    return (
+      <AppLayout>
+        <h1>0 Posts</h1>
+        <p>No posts found for the specified month and year.</p>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout>
-      <Main posts={[]} />
+      <h1>History: {month}/{year}</h1>
+      <Main posts={filteredPosts} />
     </AppLayout>
   );
 }

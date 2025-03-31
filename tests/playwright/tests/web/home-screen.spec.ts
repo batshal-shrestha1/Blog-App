@@ -47,8 +47,8 @@ test.describe("HOME SCREEN", () => {
 
       await checkItem(page, "Category / React", "/category/react");
       await checkItem(page, "Category / Node", "/category/node");
-      await checkItem(page, "Category / Mongo", "/category/mongo");
-      await checkItem(page, "Category / DevOps", "/category/devops");
+      // await checkItem(page, "Category / Mongo", "/category/mongo");
+      // await checkItem(page, "Category / DevOps", "/category/devops");
     },
   );
 

@@ -1,7 +1,7 @@
 import { BlogDetail } from "@/components/Blog/Detail";
 import { AppLayout } from "@/components/Layout/AppLayout";
 import { posts } from "@repo/db/data";
-import { parse, marked } from "marked";
+import { parse } from "marked";
 
 export default async function Page({
   params,
@@ -14,6 +14,7 @@ export default async function Page({
     return post.urlId === urlId
   });
 
+
   if (!post) {
     return (
       <AppLayout>
@@ -23,12 +24,9 @@ export default async function Page({
     );
   }
 
-  // Process the markdown content on the server side
-  const processedContent = await marked(post.content, { async: true });
-
   return (
     <AppLayout>
-      <BlogDetail post={{...post, content: processedContent}} />
+      <BlogDetail post={post} />
       {/* <h1 data-test-id={`blog-post-${post.id}`}>{post.title}</h1>
       <div dangerouslySetInnerHTML={{__html : parse(post.content)}}></div> */}
     </AppLayout>

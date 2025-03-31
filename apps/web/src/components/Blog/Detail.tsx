@@ -2,30 +2,25 @@
 import type { Post } from "@repo/db/data";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import Image from "next/image"; // Importing Image component from Next.js
+import Image from "next/image";
+import { marked } from "marked";
 
 export function BlogDetail({ post }: { post: Post }) {
-  const [views, setViews] = useState(post.views); // Initialize with the value from the Post object
+  const [views, setViews] = useState(post.views);
   const [likes, setLikes] = useState(post.likes);
-  const [isLiked, setIsLiked] = useState(false); // Track if the user has liked the post
+  const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
-    // Increment views every time the page is visited
-    setViews((prevViews) => prevViews + 1);
-
-    // Update the views in the Post object (mocked here)
-    post.views = post.views + 1; // Increment the original post.views value
-  }, []); // Runs only once when the component mounts
+    if (views === post.views) {
+      const newViewCount = post.views + 1;
+      setViews(newViewCount);
+      post.views = newViewCount;
+    }
+  }, []);
 
   const handleLike = () => {
-    if (isLiked) {
-      // Unlike the post
-      setLikes((prevLikes) => prevLikes - 1);
-    } else {
-      // Like the post
-      setLikes((prevLikes) => prevLikes + 1);
-    }
-    setIsLiked(!isLiked); // Toggle the like state
+    setLikes((prevLikes) => (isLiked ? prevLikes - 1 : prevLikes + 1));
+    setIsLiked(!isLiked);
   };
 
   const tags = post.tags.split(",").map((tag) => tag.trim());
@@ -36,20 +31,27 @@ export function BlogDetail({ post }: { post: Post }) {
     year: "numeric",
   });
 
+  // Safely parse Markdown content
+  const parsedContent = post.content
+    ? marked(post.content)
+    : "<p>No content available</p>";
+
   return (
     <article data-test-id={`blog-post-${post.id}`}>
       <h2 style={{ fontWeight: "bold" }}>
         <Link href={`/post/${post.urlId}`}>{post.title}</Link>
       </h2>
       <Image
-        src={post.imageUrl} // The image URL
-        alt={post.title} // Alt text for accessibility
-        width={600} // Set the width of the image
-        height={400} // Set the height of the image
-        style={{ objectFit: "cover", borderRadius: "8px" }} // Optional: Add styling for the image
+        src={post.imageUrl}
+        alt={post.title}
+        width={600}
+        height={400}
+        style={{ objectFit: "cover", borderRadius: "8px" }}
       />
-
-      <div dangerouslySetInnerHTML={{ __html: post.content }}></div>
+      <div
+        data-test-id={`content-markdown`}
+        dangerouslySetInnerHTML={{ __html: parsedContent }}
+      ></div>
       <div>{post.category}</div>
       <div>
         {tags.map((tag, index) => (
@@ -58,7 +60,6 @@ export function BlogDetail({ post }: { post: Post }) {
           </span>
         ))}
       </div>
-
       <div>{formattedDate}</div>
       <div>{views} views</div>
       <div>

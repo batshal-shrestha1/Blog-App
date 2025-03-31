@@ -16,7 +16,7 @@ test.describe("DETAIL SCREEN", () => {
 
       // DETAIL SCREEN > Detail page shows the same items as list item, but the short description is replaced by formatted long description
 
-      const item = await page.getByTestId("blog-post-1");
+      const item = page.getByTestId("blog-post-1");
       await expect(item).toBeVisible();
 
       await expect(item.getByText("Boost your conversion rate")).toBeVisible();
@@ -32,8 +32,8 @@ test.describe("DETAIL SCREEN", () => {
       await expect(item.getByText("3 likes")).toBeVisible();
 
       // DETAIL SCREEN > Detail text is stored as Markdown, which needs to be converted to HTML
-      await expect(
-        await page.getByTestId("content-markdown").innerHTML(),
+      expect(
+        await page.getByTestId("content-markdown").innerHTML()
       ).toContain("<strong>sint voluptas</strong>");
     },
   );
