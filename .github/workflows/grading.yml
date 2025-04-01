@@ -106,7 +106,7 @@ jobs:
         uses: tomitrescak/skillpies-reporting@v1.0
         with:
           courseId: ${{env.COURSE_ID}}
-          sectionId: assignment-2-1-blog-client-in-advanced-react
+          sectionId: assignment-2-1-blog-client-in-next-js
           testResult: ${{steps.npm1.outputs.result}}
 
       ####################
