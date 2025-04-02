@@ -2,14 +2,17 @@ import { AppLayout } from "@/components/Layout/AppLayout";
 import { Main } from "@/components/Main";
 import { posts } from "@repo/db/data";
 
-export default function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
-  const query = searchParams.q?.toLowerCase() || "";
+export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const { q } = await searchParams;
 
   // Filter posts based on the search query
   const filteredPosts = posts.filter(
-    (post) =>
+    (post) =>{
+
+      const query = q?.toLowerCase() || "";
       post.title.toLowerCase().includes(query) ||
       post.description.toLowerCase().includes(query)
+    }
   );
 
   // If no posts match the search query, display "0 Posts"
@@ -17,7 +20,7 @@ export default function SearchPage({ searchParams }: { searchParams: { q?: strin
     return (
       <AppLayout>
         <h1>0 Posts</h1>
-        <p>No posts found for the search query "{query}".</p>
+        <p>No posts found for the search query "{q}".</p>
       </AppLayout>
     );
   }
