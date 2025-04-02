@@ -2,16 +2,19 @@ import { AppLayout } from "@/components/Layout/AppLayout";
 import { Main } from "@/components/Main";
 import { posts } from "@repo/db/data";
 
-export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+export default async function SearchPage({ 
+  searchParams }: { searchParams: Promise<{ q?: string }>; 
+}) {
   const { q } = await searchParams;
 
   // Filter posts based on the search query
-  const filteredPosts = posts.filter(
-    (post) =>{
+  const filteredPosts = posts.filter((post) =>{
 
       const query = q?.toLowerCase() || "";
-      post.title.toLowerCase().includes(query) ||
-      post.description.toLowerCase().includes(query)
+      return (
+        post.title.toLowerCase().includes(query) ||
+        post.description.toLowerCase().includes(query)
+      );
     }
   );
 
