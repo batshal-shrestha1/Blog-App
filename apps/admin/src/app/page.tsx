@@ -1,6 +1,15 @@
 import { posts } from "@repo/db/data";
 import { cookies } from 'next/headers';
 import LoginForm from "../components/LoginForm";
+import PostList from "../components/PostList";
+import FilterBar, { FilterProvider } from "../components/FilterBar";
+
+// Function to normalize dates by removing time component
+const normalizeDate = (date: Date) => {
+  const normalized = new Date(date);
+  normalized.setHours(0, 0, 0, 0);
+  return normalized;
+};
 
 export default async function Home() {
   const cookieStore = await cookies();
@@ -9,6 +18,13 @@ export default async function Home() {
   if (!authToken) {
     return <LoginForm />;
   }
+
+  // Sort posts by date in descending order, using normalized dates
+  const sortedPosts = [...posts].sort((a, b) => {
+    const dateA = normalizeDate(a.date);
+    const dateB = normalizeDate(b.date);
+    return dateB.getTime() - dateA.getTime();
+  });
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -29,17 +45,10 @@ export default async function Home() {
       </header>
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="grid gap-6">
-            {posts.map((post) => (
-              <article
-                key={post.id}
-                className="bg-white shadow rounded-lg p-6"
-              >
-                <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
-                <p className="text-gray-600">{post.content.substring(0, 150)}...</p>
-              </article>
-            ))}
-          </div>
+          <FilterProvider>
+            <FilterBar />
+            <PostList posts={sortedPosts} />
+          </FilterProvider>
         </div>
       </main>
     </div>
