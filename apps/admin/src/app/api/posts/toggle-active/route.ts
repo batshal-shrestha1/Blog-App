@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { posts } from '@repo/db/data';
 
 export async function POST(request: NextRequest) {
   // Check authentication

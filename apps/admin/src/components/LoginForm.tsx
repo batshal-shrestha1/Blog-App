@@ -17,7 +17,7 @@ export default function LoginForm() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ password }),
-      });
+      }); 
 
       if (response.ok) {
         // Reload the page to reflect the new authentication state

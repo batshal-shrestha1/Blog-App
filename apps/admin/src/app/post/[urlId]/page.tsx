@@ -1,4 +1,4 @@
-import { Post, posts } from "@repo/db/data";
+import { posts } from "@repo/db/data";
 import { cookies } from "next/headers";
 import LoginForm from "../../../components/LoginForm";
 import UpdatePostForm from "../../../components/UpdatePostForm";

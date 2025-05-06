@@ -4,13 +4,6 @@ import LoginForm from "../components/LoginForm";
 import PostList from "../components/PostList";
 import FilterBar, { FilterProvider } from "../components/FilterBar";
 
-// Function to normalize dates by removing time component
-const normalizeDate = (date: Date) => {
-  const normalized = new Date(date);
-  normalized.setHours(0, 0, 0, 0);
-  return normalized;
-};
-
 export default async function Home() {
   const cookieStore = await cookies();
   const authToken = cookieStore.get('auth_token');
@@ -19,11 +12,9 @@ export default async function Home() {
     return <LoginForm />;
   }
 
-  // Sort posts by date in descending order, using normalized dates
+  // Sort posts by date in descending order
   const sortedPosts = [...posts].sort((a, b) => {
-    const dateA = normalizeDate(a.date);
-    const dateB = normalizeDate(b.date);
-    return dateB.getTime() - dateA.getTime();
+  return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
 
   return (
