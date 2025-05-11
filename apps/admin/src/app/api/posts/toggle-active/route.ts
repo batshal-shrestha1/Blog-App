@@ -13,10 +13,16 @@ export async function POST(request: NextRequest) {
   try {
     const { postId } = await request.json();
     
-    // In a real application, this would update the database
-    // For this demo, we'll just return success
+    if (!postId) {
+      return NextResponse.json({ error: 'Post ID is required' }, { status: 400 });
+    }
+
+    // Simulate toggling the active state of a post
+    // In a real application, this would involve a database update
+    console.log(`Toggling active state for post ID: ${postId}`);
+
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }
-} 
+}

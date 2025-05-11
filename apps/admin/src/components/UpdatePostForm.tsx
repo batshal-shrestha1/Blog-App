@@ -4,6 +4,7 @@ import { Post } from "@repo/db/data";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
+import Image from "next/image";
 
 interface UpdatePostFormProps {
   post: Post;
@@ -204,11 +205,11 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
         {errors.imageUrl && <p className="mt-1 text-sm text-red-600">{errors.imageUrl}</p>}
         {formData.imageUrl && (
           <img
-            src={formData.imageUrl}
-            alt="Preview"
-            className="mt-2 max-w-xs rounded"
-            data-test-id="image-preview"
-          />
+          src={formData.imageUrl}
+          alt="Preview"
+          className="mt-2 max-w-xs rounded"
+          data-test-id="image-preview"
+        />
         )}
       </div>
 

@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
+import Image from "next/image";
 
 interface FormErrors {
   title?: string;
@@ -211,12 +212,14 @@ export default function CreatePostForm() {
         />
         {errors.imageUrl && <p className="mt-1 text-sm text-red-600">{errors.imageUrl}</p>}
         {formData.imageUrl && (
-          <img
-            src={formData.imageUrl}
-            alt="Preview"
-            className="mt-2 max-w-xs rounded"
-            data-test-id="image-preview"
-          />
+          <Image
+          src={formData.imageUrl}
+          alt="Preview"
+          className="mt-2 max-w-xs rounded"
+          data-test-id="image-preview"
+          width={400} // Set a width for the image
+          height={300} // Set a height for the image
+        />
         )}
       </div>
 

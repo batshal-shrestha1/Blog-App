@@ -1,7 +1,6 @@
 import { BlogDetail } from "@/components/Blog/Detail";
 import { AppLayout } from "@/components/Layout/AppLayout";
 import { posts } from "@repo/db/data";
-import { parse } from "marked";
 
 export default async function Page({
   params,

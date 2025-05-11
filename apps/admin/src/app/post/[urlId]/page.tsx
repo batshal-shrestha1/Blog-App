@@ -3,11 +3,16 @@ import { cookies } from "next/headers";
 import LoginForm from "../../../components/LoginForm";
 import UpdatePostForm from "../../../components/UpdatePostForm";
 
+interface PageProps {
+  params: Promise<{ urlId: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
 export default async function UpdatePost({
   params,
-}: {
-  params: { urlId: string };
-}) {
+  searchParams,
+}: PageProps) {
+  const [resolvedParams, resolvedSearchParams] = await Promise.all([params, searchParams]);
   const cookieStore = await cookies();
   const authToken = cookieStore.get("auth_token");
 
@@ -15,7 +20,7 @@ export default async function UpdatePost({
     return <LoginForm />;
   }
 
-  const post = posts.find((p) => p.urlId === params.urlId);
+  const post = posts.find((p) => p.urlId === resolvedParams.urlId);
 
   if (!post) {
     return <div>Post not found</div>;

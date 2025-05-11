@@ -4,6 +4,7 @@ import { Post } from "@repo/db/data";
 import { useState } from "react";
 import Link from "next/link";
 import { useFilter } from "./FilterBar";
+import Image from "next/image";
 
 interface PostListProps {
   posts: Post[];
@@ -126,10 +127,12 @@ export default function PostList({ posts: initialPosts }: PostListProps) {
                 <span className="mr-4">{post.category}</span>
                 <span>{formatTags(post.tags)}</span>
               </div>
-              <img 
-                src={post.imageUrl} 
-                alt={post.title} 
+              <Image
+                src={post.imageUrl}
+                alt={post.title}
                 className="w-full h-48 object-cover rounded-md mb-4"
+                width={600} // Set a width for the image
+                height={300} // Set a height for the image
               />
             </div>
             <button
