@@ -1,20 +1,20 @@
 import { posts } from "@repo/db/data";
-import { cookies } from 'next/headers';
+import { isLoggedIn } from "../utils/auth";
 import LoginForm from "../components/LoginForm";
 import PostList from "../components/PostList";
 import FilterBar, { FilterProvider } from "../components/FilterBar";
+import LogoutButton from "../components/LogoutButton";
 
 export default async function Home() {
-  const cookieStore = await cookies();
-  const authToken = cookieStore.get('auth_token');
+  const isAuthenticated = await isLoggedIn();
 
-  if (!authToken) {
+  if (!isAuthenticated) {
     return <LoginForm />;
   }
 
   // Sort posts by date in descending order
   const sortedPosts = [...posts].sort((a, b) => {
-  return new Date(b.date).getTime() - new Date(a.date).getTime();
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
 
   return (
@@ -24,14 +24,7 @@ export default async function Home() {
           <h1 className="text-3xl font-bold text-gray-900">
             Admin of Full Stack Blog
           </h1>
-          <form action="/api/auth/logout" method="POST">
-            <button
-              type="submit"
-              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-            >
-              Logout
-            </button>
-          </form>
+          <LogoutButton />
         </div>
       </header>
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
