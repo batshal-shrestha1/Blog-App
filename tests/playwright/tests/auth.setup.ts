@@ -14,13 +14,13 @@ setup(
     const content = {
       cookies: [
         {
-          name: "password",
-          value: "123",
+          name: "auth_token",
+          value: "true",
           domain: "localhost",
           secure: false,
           expires: -1,
           path: "/",
-          httpOnly: false,
+          httpOnly: true,
           sameSite: "Lax",
         },
       ],

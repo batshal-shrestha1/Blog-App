@@ -1,4 +1,4 @@
-export function tags<T>(
+export function tags(
   posts: { tags: string; active: boolean }[],
 ): { name: string; count: number }[] {
   return posts

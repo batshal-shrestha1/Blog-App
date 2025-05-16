@@ -1,6 +1,5 @@
 import { history } from "@/functions/history";
 import { type Post } from "@repo/db/data";
-import { toUrlPath } from "@repo/utils/url";
 import { SummaryItem } from "./SummaryItem";
 import { LinkList } from "./LinkList";
 

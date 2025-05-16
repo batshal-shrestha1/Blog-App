@@ -23,7 +23,7 @@ export default async function SearchPage({
     return (
       <AppLayout>
         <h1>0 Posts</h1>
-        <p>No posts found for the search query "{q}".</p>
+        <p>No posts found for the search query &quot;{q}&quot;.</p>
       </AppLayout>
     );
   }

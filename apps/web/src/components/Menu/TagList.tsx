@@ -5,7 +5,6 @@ import { SummaryItem } from "./SummaryItem";
 import { toUrlPath } from "@repo/utils/url";
 
 export async function TagList({
-  selectedTag,
   posts,
 }: {
   selectedTag?: string;
