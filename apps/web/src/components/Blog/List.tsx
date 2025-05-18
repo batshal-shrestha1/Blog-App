@@ -1,7 +1,7 @@
-import type { Post } from "@repo/db/data";
+import type { PostWithLikes } from "@repo/db/types";
 import { BlogListItem } from "./ListItem";
 
-export function BlogList({ posts }: { posts: Post[] }) {
+export function BlogList({ posts }: { posts: PostWithLikes[] }) {
   const activePosts = posts.filter((post) => post.active);
 
   if (activePosts.length === 0) {

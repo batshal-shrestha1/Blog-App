@@ -1,5 +1,5 @@
 import { history } from "@/functions/history";
-import { type Post } from "@repo/db/data";
+import type { PostWithLikes } from "@repo/db/types";
 import { SummaryItem } from "./SummaryItem";
 import { LinkList } from "./LinkList";
 
@@ -26,7 +26,7 @@ export async function HistoryList({
 }: {
   selectedYear?: string;
   selectedMonth?: string;
-  posts: Post[];
+  posts: PostWithLikes[];
 }) {
   const historyItems = history(posts);
 

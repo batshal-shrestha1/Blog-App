@@ -1,11 +1,11 @@
-import type { Post } from "@repo/db/data";
+import type { PostWithLikes } from "@repo/db/types";
 import BlogList from "./Blog/List";
 
 export function Main({
   posts,
   className,
 }: {
-  posts: Post[];
+  posts: PostWithLikes[];
   className?: string;
 }) {
   return (

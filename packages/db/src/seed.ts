@@ -1,3 +1,6 @@
+import { client } from "./client.js";
+import { posts } from "./data.js";
+
 export async function seed() {
   // TODO: Uncomment below once you set up Prisma and loaded data to your database
   // console.log("🌱 Seeding data");
@@ -32,3 +35,13 @@ export async function seed() {
   //   }
   // }
 }
+
+// Execute the seed function
+// seed()
+//   .catch((e) => {
+//     console.error("Error seeding database:", e);
+//     process.exit(1);
+//   })
+//   .finally(async () => {
+//     await client.db.$disconnect();
+//   });

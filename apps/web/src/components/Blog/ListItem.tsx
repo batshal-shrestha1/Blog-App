@@ -1,10 +1,10 @@
-import type { Post } from "@repo/db/data";
+import type { PostWithLikes } from "@repo/db/types";
 import Link from "next/link";
-import Image from "next/image"; 
+import Image from "next/image";
 
-export function BlogListItem({ post }: { post: Post }) {
+export function BlogListItem({ post }: { post: PostWithLikes }) {
   const tags = post.tags.split(",").map((tag) => tag.trim());
-  const formattedDate = post.date.toLocaleDateString("en-GB", {
+  const formattedDate = new Date(post.date).toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -18,14 +18,12 @@ export function BlogListItem({ post }: { post: Post }) {
       <h2 style={{ fontWeight: "bold" }}>
         <Link href={`/post/${post.urlId}`}>{post.title}</Link>
       </h2>
-      {/* <img src={post.imageUrl} alt={post.title} style={{ width: "100%", height: "auto" }} /> */}
-
       <Image
-        src={post.imageUrl} // The image URL
-        alt={post.title} // Alt text for accessibility
-        width={300} // Set the width of the image
-        height={200} // Set the height of the image
-        style={{ objectFit: "cover", width: "300px", height: "200px" }} // Consistent styling
+        src={post.imageUrl}
+        alt={post.title}
+        width={300}
+        height={200}
+        style={{ objectFit: "cover", width: "300px", height: "200px" }}
         priority
       />
       <div>{post.description}</div>
@@ -38,8 +36,6 @@ export function BlogListItem({ post }: { post: Post }) {
           </span>
         ))}
       </div>
-
-      {/* Blog Likes and Views */}
       <div>{post.likes} likes</div>
       <div>{post.views} views</div>
       <hr />

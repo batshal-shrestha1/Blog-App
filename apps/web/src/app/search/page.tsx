@@ -1,24 +1,31 @@
 import { AppLayout } from "@/components/Layout/AppLayout";
 import { Main } from "@/components/Main";
-import { posts } from "@repo/db/data";
+import { client } from "@repo/db/client";
 
-export default async function SearchPage({ 
-  searchParams }: { searchParams: Promise<{ q?: string }>; 
+async function getPostsBySearch(q: string = "") {
+  const posts = await client.db.post.findMany({
+    where: { active: true },
+    orderBy: { date: "desc" },
+    include: { Likes: true },
+  });
+
+  const query = q.toLowerCase();
+  return posts
+    .map(post => ({ ...post, likes: post.Likes.length }))
+    .filter(post =>
+      post.title.toLowerCase().includes(query) ||
+      post.description.toLowerCase().includes(query)
+    );
+}
+
+export default async function SearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
 }) {
-  const { q } = await searchParams;
+  const { q = "" } = await searchParams;
+  const filteredPosts = await getPostsBySearch(q);
 
-  // Filter posts based on the search query
-  const filteredPosts = posts.filter((post) =>{
-
-      const query = q?.toLowerCase() || "";
-      return (
-        post.title.toLowerCase().includes(query) ||
-        post.description.toLowerCase().includes(query)
-      );
-    }
-  );
-
-  // If no posts match the search query, display "0 Posts"
   if (filteredPosts.length === 0) {
     return (
       <AppLayout>
@@ -28,7 +35,6 @@ export default async function SearchPage({
     );
   }
 
-  // Render the filtered posts
   return (
     <AppLayout>
       <Main posts={filteredPosts} />
