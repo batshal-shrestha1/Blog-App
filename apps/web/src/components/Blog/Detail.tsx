@@ -1,31 +1,66 @@
 "use client";
-import type { Post } from "@repo/db/data";
+import type { Post, Like } from "@prisma/client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { marked } from "marked";
 
-export function BlogDetail({ post }: { post: Post }) {
+type PostWithLikes = Post & {
+  Likes: Like[];
+  likes: number;
+};
+
+export function BlogDetail({ post }: { post: PostWithLikes }) {
   const [views, setViews] = useState(post.views);
   const [likes, setLikes] = useState(post.likes);
   const [isLiked, setIsLiked] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false);
+  const hasIncremented = useRef<{ [key: number]: boolean }>({});
 
   useEffect(() => {
-    if (views === post.views) {
-      const newViewCount = post.views + 1;
-      setViews(newViewCount);
-      post.views = newViewCount;
-    }
-  }, []);
+    if (hasIncremented.current[post.id]) return;
+    hasIncremented.current = { [post.id]: true }; // Reset for new post
+    console.log("Incrementing views for post", post.id);
+    // Increment views and update state
+    fetch(`/api/posts/increment-views`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postId: post.id }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (typeof data.views === "number") setViews(data.views);
+      });
+    // Fetch if the user has liked this post
+    fetch(`/api/likes?postId=${post.id}`, { cache: "no-store" })
+      .then(res => res.json())
+      .then(data => {
+        console.log("isLiked GET response:", data.liked);
+        setIsLiked(data.liked);
+        setReady(true);
+      });
+  }, [post.id]);
 
-  const handleLike = () => {
-    setLikes((prevLikes) => (isLiked ? prevLikes - 1 : prevLikes + 1));
-    setIsLiked(!isLiked);
+  const handleLike = async () => {
+    if (!ready) return;
+    console.log("handleLike called, isLiked:", isLiked);
+    const method = isLiked ? "DELETE" : "POST";
+    setLoading(true);
+    const res = await fetch("/api/likes", {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postId: post.id }),
+    });
+    const data = await res.json();
+    setLikes(data.likeCount);
+    setIsLiked(data.liked);
+    setLoading(false);
   };
 
   const tags = post.tags.split(",").map((tag) => tag.trim());
 
-  const formattedDate = post.date.toLocaleDateString("en-GB", {
+  const formattedDate = new Date(post.date).toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -66,7 +101,9 @@ export function BlogDetail({ post }: { post: Post }) {
       <div>
         {likes} likes
         <button
+          data-test-id={`like-button`}
           onClick={handleLike}
+          disabled={loading || !ready}
           style={{
             marginLeft: "10px",
             padding: "5px 10px",
@@ -74,7 +111,7 @@ export function BlogDetail({ post }: { post: Post }) {
             color: "white",
             border: "none",
             borderRadius: "5px",
-            cursor: "pointer",
+            cursor: loading || !ready ? "not-allowed" : "pointer",
           }}
         >
           {isLiked ? "Unlike" : "Like"}

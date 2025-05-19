@@ -1,7 +1,6 @@
 import { BlogDetail } from "@/components/Blog/Detail";
 import { AppLayout } from "@/components/Layout/AppLayout";
 import { client } from "@repo/db/client";
-import { IncrementViews } from "@/components/Blog/IncrementViews";
 
 async function getPostByUrlId(urlId: string) {
   const post = await client.db.post.findUnique({
@@ -35,7 +34,6 @@ export default async function Page({
 
   return (
     <AppLayout>
-      <IncrementViews postId={post.id} />
       <BlogDetail post={post} />
     </AppLayout>
   );
