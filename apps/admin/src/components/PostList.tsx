@@ -1,13 +1,13 @@
 'use client';
 
-import { Post } from "@repo/db/data";
+import { PostWithLikes } from "@repo/db/types";
 import { useState } from "react";
 import Link from "next/link";
 import { useFilter } from "./FilterBar";
 import Image from "next/image";
 
 interface PostListProps {
-  posts: Post[];
+  posts: PostWithLikes[];
 }
 
 // Function to format date consistently
@@ -127,12 +127,19 @@ export default function PostList({ posts: initialPosts }: PostListProps) {
                 <span className="mr-4">{post.category}</span>
                 <span>{formatTags(post.tags)}</span>
               </div>
-              <Image
+              <img
                 src={post.imageUrl}
                 alt={post.title}
                 className="w-full h-48 object-cover rounded-md mb-4"
-                width={600} // Set a width for the image
-                height={300} // Set a height for the image
+                width={600}
+                height={300}
+                // onError={(e) => {
+                //   const target = e.currentTarget;
+                //   if (target.src !== 'http://example.com/image.jpg') {
+                //     target.src = 'http://example.com/image.jpg';
+                //   }
+                // }
+             // }
               />
             </div>
             <button

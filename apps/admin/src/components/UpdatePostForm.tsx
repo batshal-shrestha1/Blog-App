@@ -1,13 +1,13 @@
 'use client';
 
-import { Post } from "@repo/db/data";
+import { PostWithLikes } from "@repo/db/types";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import Image from "next/image";
 
 interface UpdatePostFormProps {
-  post: Post;
+  post: PostWithLikes;
 }
 
 interface FormErrors {
@@ -30,6 +30,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
     category: post.category,
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<number | null>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
@@ -100,15 +101,19 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
         }),
       });
 
-      if (response.ok) {
-        router.push('/?success=Post updated successfully');
-        router.refresh();
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to update post');
       }
+
+      setErrors({});
+      setSuccessMessage("Post updated successfully");
+      // Optionally, refresh data here if needed
     } catch (error) {
       console.error('Error updating post:', error);
       setErrors(prev => ({
         ...prev,
-        general: "Error updating post"
+        general: error instanceof Error ? error.message : "Error updating post"
       }));
     }
   };
@@ -127,6 +132,22 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {successMessage && (
+        <div
+          style={{
+            background: "#d1fae5",
+            color: "#065f46",
+            padding: "1rem",
+            borderRadius: "0.5rem",
+            marginBottom: "1rem",
+            textAlign: "center",
+            fontWeight: "bold",
+          }}
+          data-test-id="success-message"
+        >
+          {successMessage}
+        </div>
+      )}
       {errors.general && (
         <div className="text-red-600 bg-red-50 p-4 rounded">
           {errors.general}

@@ -36,7 +36,7 @@ export async function HistoryList({
   return (
     <LinkList title="History">
       <ul>
-        {historyItems.map((dateString) => {
+        {historyItems.map((dateString, idx) => {
           const date = new Date(dateString);
           const year = date.getFullYear();
           const month = months[date.getMonth() + 1];
@@ -46,7 +46,7 @@ export async function HistoryList({
 
           return (
             <SummaryItem
-              key={dateString}
+              key={`${dateString}-${idx}`}
               name={`${month} ${year}`}
               link={`/history/${year}/${date.getMonth() + 1}`}
               count={posts.filter(

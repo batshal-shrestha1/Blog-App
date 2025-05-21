@@ -26,6 +26,7 @@ export default function CreatePostForm() {
     category: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<number | null>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
@@ -89,15 +90,19 @@ export default function CreatePostForm() {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
-        router.push('/?success=Post updated successfully');
-        router.refresh();
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to create post');
       }
+
+      setErrors({});
+      setSuccessMessage("Post updated successfully");
+      // Optionally, clear the form or refresh data here if needed
     } catch (error) {
       console.error('Error creating post:', error);
       setErrors(prev => ({
         ...prev,
-        general: "Error creating post"
+        general: error instanceof Error ? error.message : "Error creating post"
       }));
     }
   };
@@ -121,6 +126,22 @@ export default function CreatePostForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {successMessage && (
+        <div
+          style={{
+            background: "#d1fae5",
+            color: "#065f46",
+            padding: "1rem",
+            borderRadius: "0.5rem",
+            marginBottom: "1rem",
+            textAlign: "center",
+            fontWeight: "bold",
+          }}
+          data-test-id="success-message"
+        >
+          {successMessage}
+        </div>
+      )}
       {errors.general && (
         <div className="text-red-600 bg-red-50 p-4 rounded">
           {errors.general}
@@ -212,14 +233,20 @@ export default function CreatePostForm() {
         />
         {errors.imageUrl && <p className="mt-1 text-sm text-red-600">{errors.imageUrl}</p>}
         {formData.imageUrl && (
-          <Image
-          src={formData.imageUrl}
-          alt="Preview"
-          className="mt-2 max-w-xs rounded"
-          data-test-id="image-preview"
-          width={400} // Set a width for the image
-          height={300} // Set a height for the image
-        />
+          <img
+            src={formData.imageUrl}
+            alt="Preview"
+            className="mt-2 max-w-xs rounded"
+            data-test-id="image-preview"
+            width={400}
+            height={300}
+            onError={(e) => {
+              const target = e.currentTarget as HTMLImageElement;
+              if (target.src !== '/placeholder.png') {
+                target.src = '/placeholder.png';
+              }
+            }}
+          />
         )}
       </div>
 

@@ -19,7 +19,9 @@ const nextConfig = {
         pathname: "/**", // Matches all paths under this hostname
       },
       
+      
     ],
+    domains: ['example.com'],
   },
 };
 

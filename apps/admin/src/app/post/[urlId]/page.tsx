@@ -1,5 +1,6 @@
-import { posts } from "@repo/db/data";
-import { cookies } from "next/headers";
+import { client } from "@repo/db/client";
+import { PostWithLikes } from "@repo/db/types";
+import { isLoggedIn } from "../../../utils/auth";
 import LoginForm from "../../../components/LoginForm";
 import UpdatePostForm from "../../../components/UpdatePostForm";
 
@@ -13,24 +14,25 @@ export default async function UpdatePost({
   searchParams,
 }: PageProps) {
   const [resolvedParams, resolvedSearchParams] = await Promise.all([params, searchParams]);
-  const cookieStore = await cookies();
-  const authToken = cookieStore.get("auth_token");
-
-  if (!authToken) {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
     return <LoginForm />;
   }
 
-  const post = posts.find((p) => p.urlId === resolvedParams.urlId);
+  const post = await client.db.post.findUnique({
+    where: { urlId: resolvedParams.urlId },
+  });
 
   if (!post) {
     return <div>Post not found</div>;
   }
 
+  const postWithLikes: PostWithLikes = { ...post, likes: 0 };
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <UpdatePostForm post={post} />
+          <UpdatePostForm post={postWithLikes} />
         </div>
       </main>
     </div>

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { Post, posts } from "@repo/db/data";
+import { client } from "@repo/db/client";
 
 interface CreatePostBody {
   title: string;
@@ -25,26 +25,23 @@ export async function POST(request: Request) {
     const body = await request.json() as CreatePostBody;
     const { title, description, content, imageUrl, tags, category } = body;
 
-    // Create a new post
-    const newPost: Post = {
-      id: Math.max(...posts.map(p => p.id)) + 1,
-      title,
-      description,
-      content,
-      imageUrl,
-      tags,
-      category,
-      urlId: title.toLowerCase().replace(/\s+/g, "-"),
-      date: new Date(),
-      views: 0,
-      likes: 0,
-      active: true,
-    };
+    // Save the new post to the database
+    const newPost = await client.db.post.create({
+      data: {
+        title,
+        description,
+        content,
+        imageUrl,
+        tags,
+        category,
+        urlId: title.toLowerCase().replace(/\s+/g, "-"),
+        date: new Date(),
+        views: 0,
+        active: true,
+      },
+    });
 
-    // Add the new post to the array
-    posts.push(newPost);
-
-    return new NextResponse(JSON.stringify({ message: "Post created successfully" }), {
+    return new NextResponse(JSON.stringify({ message: "Post created successfully", post: newPost }), {
       status: 200,
     });
   } catch (error) {
