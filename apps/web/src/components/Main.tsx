@@ -9,8 +9,12 @@ export function Main({
   className?: string;
 }) {
   return (
-    <main className={className}>
-      <BlogList posts={posts} />
+    <main className={`flex-1 ${className || ""}`}>
+      <section className="mb-10">
+        <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-gray-100">From the blog</h1>
+
+        <BlogList posts={posts} />
+      </section>
     </main>
   );
 }
