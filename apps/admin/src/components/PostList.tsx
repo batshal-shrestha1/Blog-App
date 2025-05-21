@@ -4,7 +4,6 @@ import { PostWithLikes } from "@repo/db/types";
 import { useState } from "react";
 import Link from "next/link";
 import { useFilter } from "./FilterBar";
-import Image from "next/image";
 
 interface PostListProps {
   posts: PostWithLikes[];

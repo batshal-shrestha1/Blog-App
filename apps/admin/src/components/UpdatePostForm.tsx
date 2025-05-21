@@ -2,9 +2,7 @@
 
 import { PostWithLikes } from "@repo/db/types";
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
-import Image from "next/image";
 
 interface UpdatePostFormProps {
   post: PostWithLikes;
@@ -20,7 +18,6 @@ interface FormErrors {
 }
 
 export default function UpdatePostForm({ post }: UpdatePostFormProps) {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     title: post.title,
     description: post.description,

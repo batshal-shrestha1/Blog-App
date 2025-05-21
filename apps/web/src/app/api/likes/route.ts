@@ -4,7 +4,6 @@ import { client } from "@repo/db/client";
 function getUserIP(req: NextRequest) {
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0] ||
-    (req as any).ip ||
     "unknown";
   // Fallback to ::1 for local/test/dev environments
   return ip === "unknown" ? "::1" : ip;

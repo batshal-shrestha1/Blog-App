@@ -3,7 +3,6 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
-import Image from "next/image";
 
 interface FormErrors {
   title?: string;
@@ -16,7 +15,6 @@ interface FormErrors {
 }
 
 export default function CreatePostForm() {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     title: "",
     description: "",

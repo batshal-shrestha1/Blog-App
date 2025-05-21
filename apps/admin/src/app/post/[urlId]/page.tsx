@@ -13,7 +13,7 @@ export default async function UpdatePost({
   params,
   searchParams,
 }: PageProps) {
-  const [resolvedParams, resolvedSearchParams] = await Promise.all([params, searchParams]);
+  const [resolvedParams] = await Promise.all([params, searchParams]);
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     return <LoginForm />;
