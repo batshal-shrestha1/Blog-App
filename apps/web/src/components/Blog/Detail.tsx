@@ -65,7 +65,7 @@ export function BlogDetail({ post }: { post: PostWithLikes }) {
     : "<p>No content available</p>";
 
   return (
-    <article className="bg-white dark:bg-gray-900 rounded-xl shadow p-8 max-w-3xl mx-auto mt-8">
+    <article className="bg-white dark:bg-gray-900 rounded-xl shadow p-8 max-w-3xl mx-auto mt-8" data-test-id={`blog-post-${post.id}`}>
       <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
         <Link href={`/post/${post.urlId}`}>{post.title}</Link>
       </h2>
@@ -93,14 +93,16 @@ export function BlogDetail({ post }: { post: PostWithLikes }) {
       ></div>
       <div className="flex items-center justify-between text-gray-500 text-sm mt-6">
         <span>{views} views</span>
+        <span className="flex items-center gap-1">
+          <HeartIcon className="h-5 w-5 text-red-500" /> {likes} likes
+        </span>
         <button
           data-test-id={`like-button`}
           onClick={handleLike}
           disabled={loading || !ready}
           className={`flex items-center gap-2 px-4 py-2 rounded-full text-white transition-colors ${isLiked ? "bg-red-600" : "bg-gray-400 hover:bg-red-500"} ${loading || !ready ? "opacity-50 cursor-not-allowed" : ""}`}
         >
-          <HeartIcon className="h-5 w-5" />
-          {likes} {isLiked ? "Unlike" : "Like"}
+          {isLiked ? "Unlike" : "Like"}
         </button>
       </div>
     </article>

@@ -11,7 +11,7 @@ export function BlogListItem({ post }: { post: PostWithLikes }) {
     year: "numeric",
   });
   return (
-    <li className="bg-white dark:bg-gray-900 rounded-xl shadow p-6 mb-8 flex flex-col md:flex-row gap-6">
+    <li className="bg-white dark:bg-gray-900 rounded-xl shadow p-6 mb-8 flex flex-col md:flex-row gap-6" data-test-id={`blog-post-${post.id}`}>
       <div className="flex-shrink-0">
         <Image
           src={post.imageUrl}

@@ -9,13 +9,19 @@ export function BlogList({ posts }: { posts: PostWithLikes[] }) {
   }
 
   return (
-    <div className="py-6">
-      <ul className="space-y-8">
-        {activePosts.map((post) => (
-          <BlogListItem key={post.id} post={post} />
-        ))}
-      </ul>
-    </div>
+    <section className="py-6">
+      {activePosts.length === 0 ? (
+        <div>No Active Post Found</div>
+      ) : (
+        <ul className="space-y-8">
+          {activePosts.map((post) => (
+            <article key={post.id}>
+              <BlogListItem post={post} />
+            </article>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 
