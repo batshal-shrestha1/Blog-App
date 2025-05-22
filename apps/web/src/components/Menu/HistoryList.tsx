@@ -43,11 +43,11 @@ export async function HistoryList({
           return (
             <SummaryItem
               key={`${year}-${month}`}
-              name={`${monthName} ${year}`}
+              name={`${monthName}, ${year}`}
               link={`/history/${year}/${month}`}
               count={count}
               isSelected={isSelected}
-              title={`History / ${monthName} ${year}`}
+              title={`History / ${monthName}, ${year}`}
             />
           );
         })}

@@ -8,7 +8,18 @@ export function cx(
 
   // e.g. cx("foo", "bar") => "foo bar"
   // e.g. cx("foo", { bar: true }) => "foo bar"
-  return "";
+  return classes
+    .flatMap((cls) => {
+      if (!cls) return [];
+      if (typeof cls === "string") return [cls];
+      if (typeof cls === "object") {
+        return Object.entries(cls)
+          .filter(([_, v]) => !!v)
+          .map(([k]) => k);
+      }
+      return [];
+    })
+    .join(" ");
 }
 
 export default cx;
