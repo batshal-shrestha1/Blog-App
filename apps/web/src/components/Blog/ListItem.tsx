@@ -1,9 +1,11 @@
 import type { PostWithLikes } from "@repo/db/types";
 import Link from "next/link";
-import Image from "next/image";
+// import Image from "next/image";
 import { HeartIcon } from "@heroicons/react/24/solid";
 
 export function BlogListItem({ post }: { post: PostWithLikes }) {
+  if (!post) return null;
+
   const tags = post.tags.split(",").map((tag) => tag.trim());
   const formattedDate = new Date(post.date).toLocaleDateString("en-GB", {
     day: "2-digit",
@@ -11,15 +13,14 @@ export function BlogListItem({ post }: { post: PostWithLikes }) {
     year: "numeric",
   });
   return (
-    <li className="bg-white dark:bg-gray-900 rounded-xl shadow p-6 mb-8 flex flex-col md:flex-row gap-6" data-test-id={`blog-post-${post.id}`}>
+    <>
       <div className="flex-shrink-0">
-        <Image
+        <img
           src={post.imageUrl}
           alt={post.title}
           width={320}
           height={200}
           className="rounded-lg object-cover w-[320px] h-[200px]"
-          priority
         />
       </div>
       <div className="flex flex-col flex-1 gap-2">
@@ -41,6 +42,6 @@ export function BlogListItem({ post }: { post: PostWithLikes }) {
           <span className="flex items-center gap-1"><HeartIcon className="h-4 w-4 text-red-500" /> {post.likes} likes</span>
         </div>
       </div>
-    </li>
+    </>
   );
 }

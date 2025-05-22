@@ -5,7 +5,7 @@ export function BlogList({ posts }: { posts: PostWithLikes[] }) {
   const activePosts = posts.filter((post) => post.active);
 
   if (activePosts.length === 0) {
-    return <div className="py-6">No Active Post Found</div>;
+    return <div className="py-6">0 Posts</div>;
   }
 
   return (
@@ -15,9 +15,14 @@ export function BlogList({ posts }: { posts: PostWithLikes[] }) {
       ) : (
         <ul className="space-y-8">
           {activePosts.map((post) => (
-            <article key={post.id}>
-              <BlogListItem post={post} />
-            </article>
+            <li key={post.id}>
+              <article
+                data-test-id={`blog-post-${post.id}`}
+                className="bg-white dark:bg-gray-900 rounded-xl shadow p-6 mb-8 flex flex-col md:flex-row gap-6"
+              >
+                <BlogListItem post={post} />
+              </article>
+            </li>
           ))}
         </ul>
       )}

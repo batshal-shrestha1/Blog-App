@@ -30,32 +30,24 @@ export async function HistoryList({
 }) {
   const historyItems = history(posts);
 
-  // TODO: use the "history" function on "functions" directory to get the history
-  //       and render all history items using the SummaryItem component
-
   return (
     <LinkList title="History">
       <ul>
-        {historyItems.map((dateString, idx) => {
-          const date = new Date(dateString);
-          const year = date.getFullYear();
-          const month = months[date.getMonth() + 1];
+        {historyItems.map((item, idx) => {
+          const { year, month, count } = item;
+          const monthName = months[month];
           const isSelected =
             selectedYear === year.toString() &&
-            selectedMonth === (date.getMonth() + 1).toString();
+            selectedMonth === month.toString();
 
           return (
             <SummaryItem
-              key={`${dateString}-${idx}`}
-              name={`${month} ${year}`}
-              link={`/history/${year}/${date.getMonth() + 1}`}
-              count={posts.filter(
-                (post) =>
-                  post.date.getFullYear() === year &&
-                  post.date.getMonth() === date.getMonth()
-              ).length}
+              key={`${year}-${month}`}
+              name={`${monthName} ${year}`}
+              link={`/history/${year}/${month}`}
+              count={count}
               isSelected={isSelected}
-              title={`History / ${dateString}`}
+              title={`History / ${monthName} ${year}`}
             />
           );
         })}
