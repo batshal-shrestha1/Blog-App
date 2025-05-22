@@ -28,7 +28,6 @@ export async function LeftMenu() {
         <CategoryList posts={postsWithLikes} />
         <HistoryList selectedYear="" selectedMonth="" posts={postsWithLikes} />
         <TagList selectedTag="" posts={postsWithLikes} />
-        <div className="mt-auto text-xs text-gray-400 dark:text-gray-400">Admin</div>
       </nav>
     </div>
   );
