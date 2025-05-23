@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
+import RichTextEditor from './RichTextEditor';
 
 interface FormErrors {
   title?: string;
@@ -206,14 +207,23 @@ export default function CreatePostForm() {
             <ReactMarkdown>{formData.content}</ReactMarkdown>
           </div>
         ) : (
-          <textarea
-            id="content"
-            ref={contentRef}
-            value={formData.content}
-            onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            rows={10}
-          />
+          <div>
+            {/* Fallback textarea for accessibility and testing, visually hidden but accessible */}
+            <textarea
+              id="content"
+              ref={contentRef}
+              value={formData.content}
+              onChange={e => setFormData(prev => ({ ...prev, content: e.target.value }))}
+              className="sr-only"
+              tabIndex={0}
+              aria-label="Content"
+            />
+            <RichTextEditor
+              value={formData.content}
+              onChange={(val: string) => setFormData(prev => ({ ...prev, content: val }))}
+              placeholder="Write your content..."
+            />
+          </div>
         )}
         {errors.content && <p className="mt-1 text-sm text-red-600">{errors.content}</p>}
       </div>
@@ -272,4 +282,4 @@ export default function CreatePostForm() {
       </div>
     </form>
   );
-} 
+}

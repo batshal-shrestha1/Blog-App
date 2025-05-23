@@ -1,8 +1,9 @@
 'use client';
 
 import { PostWithLikes } from "@repo/db/types";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
+import RichTextEditor from "./RichTextEditor";
 
 interface UpdatePostFormProps {
   post: PostWithLikes;
@@ -30,7 +31,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<number | null>(null);
-  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement | null>(null);
 
   // Effect to restore cursor position after preview is closed
   useEffect(() => {
@@ -118,6 +119,11 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
   const handlePreviewToggle = () => {
     if (showPreview) {
       setShowPreview(false);
+      // Restore cursor position when closing preview
+      if (contentRef.current && cursorPosition !== null) {
+        contentRef.current.focus();
+        contentRef.current.setSelectionRange(cursorPosition, cursorPosition);
+      }
     } else {
       // Save cursor position when opening preview
       if (contentRef.current) {
@@ -197,14 +203,18 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
             <ReactMarkdown>{formData.content}</ReactMarkdown>
           </div>
         ) : (
-          <textarea
-            id="content"
-            ref={contentRef}
-            value={formData.content}
-            onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            rows={10}
-          />
+          <><textarea
+              id="content"
+              ref={contentRef}
+              value={formData.content}
+              onChange={e => setFormData(prev => ({ ...prev, content: e.target.value }))}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              rows={10} />
+              
+              <RichTextEditor
+                value={formData.content}
+                onChange={val => setFormData(prev => ({ ...prev, content: val }))}
+                placeholder="Write your content..." /></>
         )}
         {errors.content && <p className="mt-1 text-sm text-red-600">{errors.content}</p>}
       </div>
@@ -268,4 +278,4 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
       </div>
     </form>
   );
-} 
+}
