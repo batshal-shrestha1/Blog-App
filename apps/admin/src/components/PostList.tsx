@@ -1,10 +1,12 @@
 'use client';
 
 import { PostWithLikes } from "@repo/db/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useFilter } from "./FilterBar";
 
+
+const POSTS_PER_PAGE = 4; // Number of posts per page
 interface PostListProps {
   posts: PostWithLikes[];
 }
@@ -21,6 +23,7 @@ const formatDate = (date: Date) => {
 export default function PostList({ posts: initialPosts }: PostListProps) {
   const [posts, setPosts] = useState(initialPosts);
   const { contentFilter, tagFilter, dateFilter, sortBy } = useFilter();
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Function to format tags
   const formatTags = (tags: string) => {
@@ -99,6 +102,21 @@ export default function PostList({ posts: initialPosts }: PostListProps) {
     }
   });
 
+  // Pagination logic
+  const totalPages = Math.ceil(sortedPosts.length / POSTS_PER_PAGE);
+  const paginatedPosts = sortedPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
+
+  // Pagination navigation
+  const goToPage = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [contentFilter, tagFilter, dateFilter, sortBy]);
+
   return (
     <div className="grid gap-6">
       <div className="flex justify-end mb-4">
@@ -109,52 +127,84 @@ export default function PostList({ posts: initialPosts }: PostListProps) {
           Create Post
         </Link>
       </div>
-      
-      {sortedPosts.map((post) => (
-        <article
-          key={post.id}
-          className="bg-white shadow rounded-lg p-6"
-          data-test-id="article"
-        >
-          <div className="flex justify-between items-start">
-            <div className="flex-1">
-              <Link href={`/post/${post.urlId}`} className="block">
-                <h2 className="text-xl font-semibold mb-2 hover:text-indigo-600">{post.title}</h2>
-              </Link>
-              <div className="flex items-center text-sm text-gray-500 mb-2">
-                <span className="mr-4">{formatDate(post.date)}</span>
-                <span className="mr-4">{post.category}</span>
-                <span>{formatTags(post.tags)}</span>
+      {paginatedPosts.length === 0 ? (
+        <div className="py-6">0 Posts</div>
+      ) : (
+        paginatedPosts.map((post) => (
+          <article
+            key={post.id}
+            className="bg-white shadow rounded-lg p-6"
+            data-test-id="article"
+          >
+            <div className="flex justify-between items-start">
+              <div className="flex-1">
+                <Link href={`/post/${post.urlId}`} className="block">
+                  <h2 className="text-xl font-semibold mb-2 hover:text-indigo-600">{post.title}</h2>
+                </Link>
+                <div className="flex items-center text-sm text-gray-500 mb-2">
+                  <span className="mr-4">{formatDate(post.date)}</span>
+                  <span className="mr-4">{post.category}</span>
+                  <span>{formatTags(post.tags)}</span>
+                </div>
+                <img
+                  src={post.imageUrl}
+                  alt={post.title}
+                  className="w-full h-48 object-cover rounded-md mb-4"
+                  width={600}
+                  height={300}
+                  // onError={(e) => {
+                  //   const target = e.currentTarget;
+                  //   if (target.src !== 'http://example.com/image.jpg') {
+                  //     target.src = 'http://example.com/image.jpg';
+                  //   }
+                  // }
+               // }
+                />
               </div>
-              <img
-                src={post.imageUrl}
-                alt={post.title}
-                className="w-full h-48 object-cover rounded-md mb-4"
-                width={600}
-                height={300}
-                // onError={(e) => {
-                //   const target = e.currentTarget;
-                //   if (target.src !== 'http://example.com/image.jpg') {
-                //     target.src = 'http://example.com/image.jpg';
-                //   }
-                // }
-             // }
-              />
+              <button
+                onClick={() => toggleActiveStatus(post.id)}
+                className={`ml-4 px-3 py-1 rounded-md ${
+                  post.active 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}
+                data-test-id="active-button"
+              >
+                {post.active ? 'Active' : 'Inactive'}
+              </button>
             </div>
-            <button
-              onClick={() => toggleActiveStatus(post.id)}
-              className={`ml-4 px-3 py-1 rounded-md ${
-                post.active 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-red-100 text-red-800'
-              }`}
-              data-test-id="active-button"
-            >
-              {post.active ? 'Active' : 'Inactive'}
-            </button>
-          </div>
-        </article>
-      ))}
+          </article>
+        ))
+      )}
+      <div className="flex justify-center items-center gap-2 mt-8" aria-label="Pagination">
+        <button
+          onClick={() => goToPage(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-3 py-1 rounded border ${currentPage === 1 ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "hover:bg-gray-100"}`}
+          aria-label="Previous Page"
+        >
+          Previous
+        </button>
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i + 1}
+            onClick={() => goToPage(i + 1)}
+            disabled={currentPage === i + 1}
+            aria-current={currentPage === i + 1 ? "page" : undefined}
+            className={`px-3 py-1 rounded border ${currentPage === i + 1 ? "bg-red-700 text-white" : "hover:bg-gray-100"}`}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button
+          onClick={() => goToPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`px-3 py-1 rounded border ${currentPage === totalPages ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "hover:bg-gray-100"}`}
+          aria-label="Next Page"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
-} 
+}
