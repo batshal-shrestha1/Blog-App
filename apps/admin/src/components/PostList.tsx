@@ -1,6 +1,5 @@
 'use client';
 
-import { PostWithLikes } from "@repo/db/types";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useFilter } from "./FilterBar";
@@ -8,7 +7,7 @@ import { useFilter } from "./FilterBar";
 
 const POSTS_PER_PAGE = 4; // Number of posts per page
 interface PostListProps {
-  posts: PostWithLikes[];
+  posts: any[]; // Accept posts with Likes array
 }
 
 // Function to format date consistently
@@ -145,6 +144,10 @@ export default function PostList({ posts: initialPosts }: PostListProps) {
                   <span className="mr-4">{formatDate(post.date)}</span>
                   <span className="mr-4">{post.category}</span>
                   <span>{formatTags(post.tags)}</span>
+                  {/* Show likes only if Likes data exists */}
+                  {Array.isArray(post.Likes) && (
+                    <span className="ml-4">{post.Likes.length} {post.Likes.length === 1 ? 'like' : 'likes'}</span>
+                  )}
                 </div>
                 <img
                   src={post.imageUrl}
@@ -152,13 +155,6 @@ export default function PostList({ posts: initialPosts }: PostListProps) {
                   className="w-full h-48 object-cover rounded-md mb-4"
                   width={600}
                   height={300}
-                  // onError={(e) => {
-                  //   const target = e.currentTarget;
-                  //   if (target.src !== 'http://example.com/image.jpg') {
-                  //     target.src = 'http://example.com/image.jpg';
-                  //   }
-                  // }
-               // }
                 />
               </div>
               <button

@@ -29,16 +29,21 @@ export function Pagination({ currentPage, totalPages, getPageUrl }: PaginationPr
           Previous
         </Link>
       )}
-      {Array.from({ length: totalPages }, (_, i) => (
-        <Link
-          key={i + 1}
-          href={getPageUrl(i + 1)}
-          aria-current={currentPage === i + 1 ? "page" : undefined}
-          className={`px-3 py-1 rounded border ${currentPage === i + 1 ? "bg-red-700 text-white" : "hover:bg-gray-100"}`}
-        >
-          {i + 1}
-        </Link>
-      ))}
+      {/* Render a button for each page number */}
+      {Array.from({ length: totalPages }, (_, i) => {
+        const pageNum = i + 1;
+        const isCurrent = currentPage === pageNum;
+        return (
+          <Link
+            key={pageNum}
+            href={getPageUrl(pageNum)}
+            aria-current={isCurrent ? "page" : undefined}
+            className={`px-3 py-1 rounded border ${isCurrent ? "bg-red-700 text-white" : "hover:bg-gray-100"}`}
+          >
+            {pageNum}
+          </Link>
+        );
+      })}
       {currentPage === totalPages ? (
         <span
           aria-disabled="true"

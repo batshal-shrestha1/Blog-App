@@ -1,19 +1,16 @@
 import { client } from "@repo/db/client";
-import { PostWithLikes } from "@repo/db/types";
 import { isLoggedIn } from "../../../utils/auth";
 import LoginForm from "../../../components/LoginForm";
 import UpdatePostForm from "../../../components/UpdatePostForm";
 
 interface PageProps {
   params: Promise<{ urlId: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function UpdatePost({
   params,
-  searchParams,
 }: PageProps) {
-  const [resolvedParams] = await Promise.all([params, searchParams]);
+  const [resolvedParams] = await Promise.all([params]);
   const loggedIn = await isLoggedIn();
   if (!loggedIn) {
     return <LoginForm />;
@@ -27,14 +24,13 @@ export default async function UpdatePost({
     return <div>Post not found</div>;
   }
 
-  const postWithLikes: PostWithLikes = { ...post, likes: 0 };
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <UpdatePostForm post={postWithLikes} />
+          <UpdatePostForm post={post} />
         </div>
       </main>
     </div>
   );
-} 
+}

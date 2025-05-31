@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import RichTextEditor from './RichTextEditor';
 

@@ -1,2 +1,2 @@
 // Common constants for the web app
-export const POSTS_PER_PAGE = 4;
+export const POSTS_PER_PAGE = 1;

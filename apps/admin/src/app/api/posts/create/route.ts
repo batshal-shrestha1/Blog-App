@@ -1,6 +1,9 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { client } from "@repo/db/client";
+import { toUrlPath } from "@repo/utils/url";
+import jwt from "jsonwebtoken";
+import { env } from "@repo/env/admin";
 
 interface CreatePostBody {
   title: string;
@@ -13,9 +16,17 @@ interface CreatePostBody {
 
 export async function POST(request: Request) {
   const cookieStore = await cookies();
-  const authToken = cookieStore.get("auth_token");
+  const authToken = cookieStore.get("auth_token")?.value;
 
+  // Verify JWT token
   if (!authToken) {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
+  try {
+    jwt.verify(authToken, env.JWT_SECRET || "");
+  } catch {
     return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
     });
@@ -34,7 +45,7 @@ export async function POST(request: Request) {
         imageUrl,
         tags,
         category,
-        urlId: title.toLowerCase().replace(/\s+/g, "-"),
+        urlId: toUrlPath(title),
         date: new Date(),
         views: 0,
         active: true,
@@ -50,4 +61,4 @@ export async function POST(request: Request) {
       status: 500,
     });
   }
-} 
+}

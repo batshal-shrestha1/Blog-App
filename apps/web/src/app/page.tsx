@@ -7,52 +7,54 @@ import { POSTS_PER_PAGE } from "./constants";
 
 function getPaginationParams(searchParams: Record<string, string | string[] | undefined>) {
   const page = parseInt((searchParams.page as string) || "1", 10);
-  const q = (searchParams.q as string) || "";
-  return { page: isNaN(page) || page < 1 ? 1 : page, q };
+  return { page: isNaN(page) || page < 1 ? 1 : page };
 }
 
-async function getPaginatedPosts({ page, q }: { page: number; q: string }) {
-  const where: any = { active: true };
-  if (q) {
-    where.OR = [
-      { title: { contains: q, mode: "insensitive" } },
-      { description: { contains: q, mode: "insensitive" } },
-    ];
-  }
-  const [total, posts] = await Promise.all([
-    client.db.post.count({ where }),
+async function getPaginatedPosts({ page }: { page: number }) {
+  // Only show active posts, no search logic here
+  const filter: any = { active: true };
+
+  // Fetch total count and paginated posts in parallel
+  const [totalPosts, paginatedPosts] = await Promise.all([
+    client.db.post.count({ where: filter }),
     client.db.post.findMany({
-      where,
+      where: filter,
       orderBy: { date: "desc" },
       include: { Likes: true },
       skip: (page - 1) * POSTS_PER_PAGE,
       take: POSTS_PER_PAGE,
     }),
   ]);
+
+  // Add a 'likes' property to each post for convenience
+  const postsWithLikes = paginatedPosts.map(post => ({
+    ...post,
+    likes: post.Likes.length,
+  }));
+
   return {
-    posts: posts.map(post => ({ ...post, likes: post.Likes.length })),
-    total,
+    posts: postsWithLikes,
+    total: totalPosts,
   };
 }
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const resolvedParams = await searchParams;
-  const { page, q } = getPaginationParams(resolvedParams || {});
-  const { posts, total } = await getPaginatedPosts({ page, q });
+  const { page } = getPaginationParams(resolvedParams || {});
+  const { posts, total } = await getPaginatedPosts({ page });
   const totalPages = Math.ceil(total / POSTS_PER_PAGE);
 
   if (posts.length === 0) {
     return (
       <AppLayout>
         <h1>0 Posts</h1>
-        <p>No posts found{q ? ` for search "${q}"` : ""}.</p>
+        <p>No posts found.</p>
       </AppLayout>
     );
   }
 
   const getPageUrl = (p: number) => {
     const params = new URLSearchParams();
-    if (q) params.set("q", q);
     if (p > 1) params.set("page", String(p));
     return `/?${params.toString()}`;
   };

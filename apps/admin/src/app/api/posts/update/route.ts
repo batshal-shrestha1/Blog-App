@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { client } from '@repo/db/client';
+import jwt from 'jsonwebtoken';
+import { env } from '@repo/env/admin';
+import { toUrlPath } from '@repo/utils/url';
 
 export async function POST(request: NextRequest) {
   // Check authentication
   const cookieStore = cookies();
-  const authToken = (await cookieStore).get('auth_token');
-  
+  const authToken = (await cookieStore).get('auth_token')?.value;
+
+  // Verify JWT token
   if (!authToken) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  try {
+    jwt.verify(authToken, env.JWT_SECRET || '');
+  } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -37,7 +46,7 @@ export async function POST(request: NextRequest) {
         imageUrl,
         tags,
         category,
-        urlId: title.toLowerCase().replace(/\s+/g, '-') // Update urlId based on new title
+        urlId: toUrlPath(title) // Use toUrlPath for urlId
       }
     });
 
@@ -46,4 +55,4 @@ export async function POST(request: NextRequest) {
     console.error('Error updating post:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-} 
+}

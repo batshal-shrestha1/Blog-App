@@ -1,12 +1,12 @@
 'use client';
 
-import { PostWithLikes } from "@repo/db/types";
+import type { Post } from "@prisma/client";
 import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import RichTextEditor from "./RichTextEditor";
 
 interface UpdatePostFormProps {
-  post: PostWithLikes;
+  post: Post;
 }
 
 interface FormErrors {
