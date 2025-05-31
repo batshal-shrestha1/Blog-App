@@ -1,10 +1,9 @@
 'use client';
 
-import { Post } from "@repo/db/data";
-import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import type { Post } from "@prisma/client";
+import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
-import Image from "next/image";
+import RichTextEditor from "./RichTextEditor";
 
 interface UpdatePostFormProps {
   post: Post;
@@ -20,7 +19,6 @@ interface FormErrors {
 }
 
 export default function UpdatePostForm({ post }: UpdatePostFormProps) {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     title: post.title,
     description: post.description,
@@ -30,9 +28,10 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
     category: post.category,
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [cursorPosition, setCursorPosition] = useState<number | null>(null);
-  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const contentRef = useRef<HTMLTextAreaElement | null>(null);
 
   // Effect to restore cursor position after preview is closed
   useEffect(() => {
@@ -100,15 +99,19 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
         }),
       });
 
-      if (response.ok) {
-        router.push('/?success=Post updated successfully');
-        router.refresh();
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to update post');
       }
+
+      setErrors({});
+      setSuccessMessage("Post updated successfully");
+      // Optionally, refresh data here if needed
     } catch (error) {
       console.error('Error updating post:', error);
       setErrors(prev => ({
         ...prev,
-        general: "Error updating post"
+        general: error instanceof Error ? error.message : "Error updating post"
       }));
     }
   };
@@ -116,6 +119,11 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
   const handlePreviewToggle = () => {
     if (showPreview) {
       setShowPreview(false);
+      // Restore cursor position when closing preview
+      if (contentRef.current && cursorPosition !== null) {
+        contentRef.current.focus();
+        contentRef.current.setSelectionRange(cursorPosition, cursorPosition);
+      }
     } else {
       // Save cursor position when opening preview
       if (contentRef.current) {
@@ -127,6 +135,22 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {successMessage && (
+        <div
+          style={{
+            background: "#d1fae5",
+            color: "#065f46",
+            padding: "1rem",
+            borderRadius: "0.5rem",
+            marginBottom: "1rem",
+            textAlign: "center",
+            fontWeight: "bold",
+          }}
+          data-test-id="success-message"
+        >
+          {successMessage}
+        </div>
+      )}
       {errors.general && (
         <div className="text-red-600 bg-red-50 p-4 rounded">
           {errors.general}
@@ -179,14 +203,18 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
             <ReactMarkdown>{formData.content}</ReactMarkdown>
           </div>
         ) : (
-          <textarea
-            id="content"
-            ref={contentRef}
-            value={formData.content}
-            onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            rows={10}
-          />
+          <><textarea
+              id="content"
+              ref={contentRef}
+              value={formData.content}
+              onChange={e => setFormData(prev => ({ ...prev, content: e.target.value }))}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              rows={10} />
+              
+              <RichTextEditor
+                value={formData.content}
+                onChange={val => setFormData(prev => ({ ...prev, content: val }))}
+                placeholder="Write your content..." /></>
         )}
         {errors.content && <p className="mt-1 text-sm text-red-600">{errors.content}</p>}
       </div>
@@ -250,4 +278,4 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
       </div>
     </form>
   );
-} 
+}

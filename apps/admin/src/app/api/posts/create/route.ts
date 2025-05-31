@@ -1,6 +1,9 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { Post, posts } from "@repo/db/data";
+import { client } from "@repo/db/client";
+import { toUrlPath } from "@repo/utils/url";
+import jwt from "jsonwebtoken";
+import { env } from "@repo/env/admin";
 
 interface CreatePostBody {
   title: string;
@@ -13,9 +16,17 @@ interface CreatePostBody {
 
 export async function POST(request: Request) {
   const cookieStore = await cookies();
-  const authToken = cookieStore.get("auth_token");
+  const authToken = cookieStore.get("auth_token")?.value;
 
+  // Verify JWT token
   if (!authToken) {
+    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
+  try {
+    jwt.verify(authToken, env.JWT_SECRET || "");
+  } catch {
     return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
     });
@@ -25,26 +36,23 @@ export async function POST(request: Request) {
     const body = await request.json() as CreatePostBody;
     const { title, description, content, imageUrl, tags, category } = body;
 
-    // Create a new post
-    const newPost: Post = {
-      id: Math.max(...posts.map(p => p.id)) + 1,
-      title,
-      description,
-      content,
-      imageUrl,
-      tags,
-      category,
-      urlId: title.toLowerCase().replace(/\s+/g, "-"),
-      date: new Date(),
-      views: 0,
-      likes: 0,
-      active: true,
-    };
+    // Save the new post to the database
+    const newPost = await client.db.post.create({
+      data: {
+        title,
+        description,
+        content,
+        imageUrl,
+        tags,
+        category,
+        urlId: toUrlPath(title),
+        date: new Date(),
+        views: 0,
+        active: true,
+      },
+    });
 
-    // Add the new post to the array
-    posts.push(newPost);
-
-    return new NextResponse(JSON.stringify({ message: "Post created successfully" }), {
+    return new NextResponse(JSON.stringify({ message: "Post created successfully", post: newPost }), {
       status: 200,
     });
   } catch (error) {
@@ -53,4 +61,4 @@ export async function POST(request: Request) {
       status: 500,
     });
   }
-} 
+}

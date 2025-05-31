@@ -1,12 +1,10 @@
-import { cookies } from "next/headers";
+import { isLoggedIn } from "../../../utils/auth";
 import LoginForm from "../../../components/LoginForm";
 import CreatePostForm from "../../../components/CreatePostForm";
 
 export default async function CreatePost() {
-  const cookieStore = await cookies();
-  const authToken = cookieStore.get("auth_token");
-
-  if (!authToken) {
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
     return <LoginForm />;
   }
 

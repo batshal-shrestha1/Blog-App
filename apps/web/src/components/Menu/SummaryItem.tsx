@@ -15,14 +15,17 @@ export function SummaryItem({
   // TODO: Implement the summary item
   // must show the number of posts in that category and the name
   // if if is selected it must show in different color/background
-  const itemStyle = isSelected
-    ? { backgroundColor: "#f0f0f0", fontWeight: "bold" }
-    : { backgroundColor: "transparent" };
-
   return (
-    <li style={itemStyle}>
-      <Link href={link} title={title || name}  style={{ textDecoration: "none", color: "inherit" }}>
-        {name} <span data-test-id="post-count">({count})</span>
+    <li>
+      <Link
+        href={link}
+        title={title || name}
+        className={`flex items-center justify-between px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors${isSelected ? " selected bg-gray-200 dark:bg-gray-700 font-bold" : ""}`}
+      >
+        <span>{name}</span>
+        <span className="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-full" data-test-id="post-count">
+          {count}
+        </span>
       </Link>
     </li>
   );

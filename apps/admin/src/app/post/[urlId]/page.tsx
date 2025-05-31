@@ -1,26 +1,24 @@
-import { posts } from "@repo/db/data";
-import { cookies } from "next/headers";
+import { client } from "@repo/db/client";
+import { isLoggedIn } from "../../../utils/auth";
 import LoginForm from "../../../components/LoginForm";
 import UpdatePostForm from "../../../components/UpdatePostForm";
 
 interface PageProps {
   params: Promise<{ urlId: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function UpdatePost({
   params,
-  searchParams,
 }: PageProps) {
-  const [resolvedParams, resolvedSearchParams] = await Promise.all([params, searchParams]);
-  const cookieStore = await cookies();
-  const authToken = cookieStore.get("auth_token");
-
-  if (!authToken) {
+  const [resolvedParams] = await Promise.all([params]);
+  const loggedIn = await isLoggedIn();
+  if (!loggedIn) {
     return <LoginForm />;
   }
 
-  const post = posts.find((p) => p.urlId === resolvedParams.urlId);
+  const post = await client.db.post.findUnique({
+    where: { urlId: resolvedParams.urlId },
+  });
 
   if (!post) {
     return <div>Post not found</div>;
@@ -35,4 +33,4 @@ export default async function UpdatePost({
       </main>
     </div>
   );
-} 
+}

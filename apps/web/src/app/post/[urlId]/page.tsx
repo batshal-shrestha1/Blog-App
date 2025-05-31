@@ -1,18 +1,27 @@
 import { BlogDetail } from "@/components/Blog/Detail";
 import { AppLayout } from "@/components/Layout/AppLayout";
-import { posts } from "@repo/db/data";
+import { client } from "@repo/db/client";
+
+async function getPostByUrlId(urlId: string) {
+  const post = await client.db.post.findUnique({
+    where: { urlId },
+    include: { Likes: true }
+  });
+
+  if (!post) return null;
+
+  return {
+    ...post,
+    likes: post.Likes.length // Convert Likes array to count
+  };
+}
 
 export default async function Page({
   params,
 }: {
-  params: Promise<{ urlId: string }>;
+  params: Promise<{ urlId: string }>
 }) {
-  const { urlId } = await params;
-
-  const post = posts.find((post) => { 
-    return post.urlId === urlId
-  });
-
+  const post = await getPostByUrlId((await params).urlId);
 
   if (!post) {
     return (
@@ -26,8 +35,6 @@ export default async function Page({
   return (
     <AppLayout>
       <BlogDetail post={post} />
-      {/* <h1 data-test-id={`blog-post-${post.id}`}>{post.title}</h1>
-      <div dangerouslySetInnerHTML={{__html : parse(post.content)}}></div> */}
     </AppLayout>
   );
 }
