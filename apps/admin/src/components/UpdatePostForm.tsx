@@ -4,6 +4,7 @@ import type { Post } from "@prisma/client";
 import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import RichTextEditor from "./RichTextEditor";
+import Image from "next/image";
 
 interface UpdatePostFormProps {
   post: Post;
@@ -288,7 +289,7 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
           {uploading && <p className="text-sm text-blue-600 mt-1">Uploading...</p>}
           {errors.imageUrl && <p className="mt-1 text-sm text-red-600">{errors.imageUrl}</p>}
           {formData.imageUrl && (
-            <img
+            <Image
               src={formData.imageUrl}
               alt="Preview"
               className="mt-2 max-w-xs rounded"

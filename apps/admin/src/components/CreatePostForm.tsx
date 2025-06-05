@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import RichTextEditor from './RichTextEditor';
+import Image from "next/image";
 
 interface FormErrors {
   title?: string;
@@ -288,7 +289,7 @@ export default function CreatePostForm() {
           {uploading && <p className="text-sm text-blue-600 mt-1">Uploading...</p>}
           {errors.imageUrl && <p className="mt-1 text-sm text-red-600">{errors.imageUrl}</p>}
           {formData.imageUrl && (
-            <img
+            <Image
               src={formData.imageUrl}
               alt="Preview"
               className="mt-2 max-w-xs rounded"

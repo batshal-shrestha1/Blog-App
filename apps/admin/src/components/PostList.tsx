@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useFilter } from "./FilterBar";
-
+import Image from "next/image";
 
 const POSTS_PER_PAGE = 4; // Number of posts per page
 interface PostListProps {
@@ -129,48 +129,66 @@ export default function PostList({ posts: initialPosts }: PostListProps) {
       {paginatedPosts.length === 0 ? (
         <div className="py-6">0 Posts</div>
       ) : (
-        paginatedPosts.map((post) => (
-          <article
-            key={post.id}
-            className="bg-white shadow rounded-lg p-6"
-            data-test-id="article"
-          >
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                <Link href={`/post/${post.urlId}`} className="block">
-                  <h2 className="text-xl font-semibold mb-2 hover:text-indigo-600">{post.title}</h2>
-                </Link>
-                <div className="flex items-center text-sm text-gray-500 mb-2">
-                  <span className="mr-4">{formatDate(post.date)}</span>
-                  <span className="mr-4">{post.category}</span>
-                  <span>{formatTags(post.tags)}</span>
-                  {/* Show likes only if Likes data exists */}
-                  {Array.isArray(post.Likes) && (
-                    <span className="ml-4">{post.Likes.length} {post.Likes.length === 1 ? 'like' : 'likes'}</span>
-                  )}
-                </div>
-                <img
+        paginatedPosts.map((post) => {
+          const tags = post.tags.split(',').map((tag: string) => tag.trim());
+          const formattedDate = new Date(post.date).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          });
+          return (
+            <article
+              key={post.id}
+              className="bg-white rounded-2xl shadow p-6 flex flex-col md:flex-row gap-6 items-stretch mb-4 border border-gray-100"
+              data-test-id="article"
+            >
+              <div className="flex-shrink-0 flex items-center justify-center">
+                <Image
                   src={post.imageUrl}
                   alt={post.title}
-                  className="w-full h-48 object-cover rounded-md mb-4"
-                  width={600}
-                  height={300}
+                  width={320}
+                  height={200}
+                  className="rounded-lg object-cover w-[320px] h-[200px]"
                 />
               </div>
-              <button
-                onClick={() => toggleActiveStatus(post.id)}
-                className={`ml-4 px-3 py-1 rounded-md ${
-                  post.active 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}
-                data-test-id="active-button"
-              >
-                {post.active ? 'Active' : 'Inactive'}
-              </button>
-            </div>
-          </article>
-        ))
+              <div className="flex flex-col flex-1 gap-2">
+                <div className="flex items-center text-xs text-gray-500 gap-4 mb-1">
+                  <span>{formattedDate}</span>
+                  <span>{post.category}</span>
+                </div>
+                <Link href={`/post/${post.urlId}`} className="block">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-1 hover:text-indigo-600 transition-colors">
+                    {post.title}
+                  </h2>
+                </Link>
+                <div className="text-gray-600 mb-2 line-clamp-3 text-base">{post.description}</div>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {tags.map((tag: string, index: number) => (
+                    <span key={index} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">#{tag}</span>
+                  ))}
+                </div>
+                <div className="flex items-center text-sm text-gray-400 gap-6 mt-auto">
+                  <span>{post.views} views</span>
+                  {Array.isArray(post.Likes) && (
+                    <span className="flex items-center gap-1 text-red-500 font-medium">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="h-4 w-4"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" /></svg>
+                      {post.Likes.length} {post.Likes.length === 1 ? 'like' : 'likes'}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col items-end ml-4">
+                <button
+                  onClick={() => toggleActiveStatus(post.id)}
+                  className={`px-3 py-1 rounded-md text-xs font-semibold border transition-colors mb-2 ${post.active ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200'}`}
+                  data-test-id="active-button"
+                >
+                  {post.active ? 'Active' : 'Inactive'}
+                </button>
+              </div>
+            </article>
+          );
+        })
       )}
       <div className="flex justify-center items-center gap-2 mt-8" aria-label="Pagination">
         <button
