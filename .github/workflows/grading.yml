@@ -13,7 +13,7 @@ jobs:
       # in GitHub repo → Settings → Secrets → Actions
       E2E: true
       CI: true
-      DATABASE_URL: file:./dev.db
+      DATABASE_URL: postgresql://neondb_owner:npg_V3RnXuSKDJ9T@ep-little-butterfly-a41xxdw8-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       COURSE_ID: full-stack-development-comp3036-2025
       PASSWORD: 123
