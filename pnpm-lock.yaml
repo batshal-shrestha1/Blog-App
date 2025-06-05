@@ -72,6 +72,9 @@ importers:
       '@tiptap/starter-kit':
         specifier: ^2.0.0
         version: 2.0.0(@tiptap/pm@2.12.0)
+      cloudinary:
+        specifier: ^2.6.1
+        version: 2.6.1
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
@@ -212,6 +215,9 @@ importers:
       '@repo/env':
         specifier: workspace:*
         version: link:../env
+      cloudinary:
+        specifier: ^2.6.1
+        version: 2.6.1
       prisma:
         specifier: ^6.3.1
         version: 6.3.1(typescript@5.7.3)
@@ -2393,6 +2399,10 @@ packages:
     resolution: {integrity: sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==}
     engines: {node: '>=0.8'}
 
+  cloudinary@2.6.1:
+    resolution: {integrity: sha512-Dt7o3p4VzxYoTi+EqWkVQmGy6WiXIyMcG5Gbr9kPR/EQ+jZa+3FFzlDKfDx1uDsaB1aTR1gYeO6wZqrgLFaByQ==}
+    engines: {node: '>=9'}
+
   color-convert@1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
 
@@ -3969,6 +3979,14 @@ packages:
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
+
+  q@1.5.1:
+    resolution: {integrity: sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw==}
+    engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
+    deprecated: |-
+      You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+
+      (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   querystringify@2.2.0:
     resolution: {integrity: sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ==}
@@ -6794,6 +6812,11 @@ snapshots:
 
   clone@1.0.4: {}
 
+  cloudinary@2.6.1:
+    dependencies:
+      lodash: 4.17.21
+      q: 1.5.1
+
   color-convert@1.9.3:
     dependencies:
       color-name: 1.1.3
@@ -8727,6 +8750,8 @@ snapshots:
   punycode.js@2.3.1: {}
 
   punycode@2.3.1: {}
+
+  q@1.5.1: {}
 
   querystringify@2.2.0: {}
 

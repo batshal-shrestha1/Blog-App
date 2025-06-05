@@ -23,6 +23,7 @@
     "@tiptap/extension-underline": "^2.0.0",
     "@tiptap/react": "^2.0.0",
     "@tiptap/starter-kit": "^2.0.0",
+    "cloudinary": "^2.6.1",
     "jsonwebtoken": "^9.0.2",
     "marked": "^15.0.6",
     "next": "^15.1.6",
