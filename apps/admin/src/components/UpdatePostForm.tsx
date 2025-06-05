@@ -235,18 +235,26 @@ export default function UpdatePostForm({ post }: UpdatePostFormProps) {
               <ReactMarkdown>{formData.content}</ReactMarkdown>
             </div>
           ) : (
-            <><textarea
+            <>
+              <textarea
                 id="content"
                 ref={contentRef}
-                value={formData.content}
+                value={formData.content.replace(/<[^>]+>/g, '')}
                 onChange={e => setFormData(prev => ({ ...prev, content: e.target.value }))}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                rows={10} />
-                
-                <RichTextEditor
-                  value={formData.content}
-                  onChange={val => setFormData(prev => ({ ...prev, content: val }))}
-                  placeholder="Write your content..." /></>
+                rows={10}
+                aria-label="Content"
+              />
+              <RichTextEditor
+                value={formData.content}
+                onChange={val => {
+                  // If Quill returns empty HTML, treat as empty string
+                  const isEmpty = val === '<p><br></p>' || val.trim() === '';
+                  setFormData(prev => ({ ...prev, content: isEmpty ? '' : val }));
+                }}
+                placeholder="Write your content..."
+              />
+            </>
           )}
           {errors.content && <p className="mt-1 text-sm text-red-600">{errors.content}</p>}
         </div>

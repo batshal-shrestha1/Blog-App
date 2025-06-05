@@ -1,8 +1,7 @@
-import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
-
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+// @ts-ignore
+import Quill from 'quill';
+import 'quill/dist/quill.snow.css';
 
 interface RichTextEditorProps {
   value: string;
@@ -12,84 +11,38 @@ interface RichTextEditorProps {
 }
 
 export default function RichTextEditor({ value, onChange, placeholder, id }: RichTextEditorProps) {
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-    ],
-    content: value,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
-    },
-    editorProps: {
-      attributes: {
-        class: 'prose min-h-[200px] p-2 border rounded-b-md bg-white focus:outline-none',
-        ...(id ? { id } : {}),
-      },
-    },
-  });
+  const quillRef = useRef<HTMLDivElement>(null);
+  const editorInstance = useRef<Quill | null>(null);
 
   useEffect(() => {
-    if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value || '', false);
+    if (quillRef.current && !editorInstance.current) {
+      editorInstance.current = new Quill(quillRef.current, {
+        theme: 'snow',
+        placeholder: placeholder || 'Write your content...',
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, 3, false] }],
+            ['bold', 'italic', 'underline'],
+            [{ list: 'ordered' }, { list: 'bullet' }],
+            ['link', 'image'],
+            ['clean'],
+          ],
+        },
+      });
+      editorInstance.current.on('text-change', () => {
+        onChange(editorInstance.current!.root.innerHTML);
+      });
+    }
+    // Set initial value
+    if (editorInstance.current && value !== editorInstance.current.root.innerHTML) {
+      editorInstance.current.root.innerHTML = value || '';
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  }, [quillRef, value]);
 
   return (
     <div>
-      {/* Simple Toolbar */}
-      <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1"></label>
-      <div className="flex gap-3 mb-2 bg-gray-100 p-2 rounded-t-md border border-b-0 shadow-sm">
-        <button
-          type="button"
-          onClick={() => editor?.chain().focus().toggleBold().run()}
-          className={`px-3 py-1 rounded font-bold text-lg transition border ${editor?.isActive('bold') ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-800 border-gray-300 hover:bg-indigo-100'}`}
-        >
-          B
-        </button>
-        <button
-          type="button"
-          onClick={() => editor?.chain().focus().toggleItalic().run()}
-          className={`px-3 py-1 rounded italic text-lg transition border ${editor?.isActive('italic') ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-800 border-gray-300 hover:bg-indigo-100'}`}
-        >
-          I
-        </button>
-        <button
-          type="button"
-          onClick={() => editor?.chain().focus().toggleUnderline().run()}
-          className={`px-3 py-1 rounded underline text-lg transition border ${editor?.isActive('underline') ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-800 border-gray-300 hover:bg-indigo-100'}`}
-        >
-          U
-        </button>
-      </div>
-      {/* Bubble Menu for inline formatting */}
-      {editor && (
-        <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }} className="flex gap-2 bg-white border border-gray-300 rounded shadow-md p-1">
-          <button
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`px-2 py-1 rounded font-bold text-lg transition border ${editor.isActive('bold') ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-800 border-gray-300 hover:bg-indigo-100'}`}
-            title="Bold"
-          >
-            B
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`px-2 py-1 rounded italic text-lg transition border ${editor.isActive('italic') ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-800 border-gray-300 hover:bg-indigo-100'}`}
-            title="Italic"
-          >
-            I
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-            className={`px-2 py-1 rounded underline text-lg transition border ${editor.isActive('underline') ? 'bg-indigo-500 text-white border-indigo-500' : 'bg-white text-gray-800 border-gray-300 hover:bg-indigo-100'}`}
-            title="Underline"
-          >
-            U
-          </button>
-        </BubbleMenu>
-      )}
-      <EditorContent editor={editor} id="content" />
+      <div ref={quillRef} id={id} style={{ minHeight: 200, background: 'white', borderRadius: 6 }} />
     </div>
   );
 }

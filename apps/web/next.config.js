@@ -18,10 +18,15 @@ const nextConfig = {
         hostname: "m.media-amazon.com",
         pathname: "/**", // Matches all paths under this hostname
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**", // Allow all Cloudinary images
+      },
       
       
     ],
-    domains: ['example.com'],
+    domains: ['example.com', 'res.cloudinary.com'],
   },
 };
 
