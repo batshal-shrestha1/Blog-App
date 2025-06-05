@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import ThemeSwitch from "../Themes/ThemeSwitcher";
 import { useState } from "react";
+import Link from "next/link";
 
 function debounce<T extends (...args: any[]) => any>(fn: T, delay = 300) {
   let timeoutId: any;
@@ -40,14 +41,14 @@ export function TopMenu({ query }: { query?: string }) {
         </form>
       </div>
       <div className="ml-6 flex-shrink-0 flex items-center gap-4">
-        <a
-          href="http://localhost:3002"
+        <Link
+          href="https://blog-app-web-eight.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
           className="px-4 py-2 rounded bg-red-700 text-white font-semibold hover:bg-red-800 transition"
         >
           Admin
-        </a>
+        </Link>
         <ThemeSwitch />
       </div>
     </div>
