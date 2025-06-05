@@ -20,14 +20,14 @@ export async function POST(request: Request) {
 
   // Verify JWT token
   if (!authToken) {
-    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+    return NextResponse.json({ error: "Unauthorized" }, {
       status: 401,
     });
   }
   try {
     jwt.verify(authToken, env.JWT_SECRET || "");
   } catch {
-    return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
+    return NextResponse.json({ error: "Unauthorized" }, {
       status: 401,
     });
   }
@@ -52,12 +52,12 @@ export async function POST(request: Request) {
       },
     });
 
-    return new NextResponse(JSON.stringify({ message: "Post created successfully", post: newPost }), {
+    return NextResponse.json({ message: "Post created successfully", post: newPost }, {
       status: 200,
     });
   } catch (error) {
     console.error("Error creating post:", error);
-    return new NextResponse(JSON.stringify({ error: "Internal server error" }), {
+    return NextResponse.json({ error: "Internal server error" }, {
       status: 500,
     });
   }
