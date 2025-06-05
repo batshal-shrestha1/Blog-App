@@ -42,7 +42,7 @@ export function TopMenu({ query }: { query?: string }) {
       </div>
       <div className="ml-6 flex-shrink-0 flex items-center gap-4">
         <Link
-          href="https://blog-app-web-eight.vercel.app"
+          href="https://blog-app-admin-opal.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
           className="px-4 py-2 rounded bg-red-700 text-white font-semibold hover:bg-red-800 transition"
