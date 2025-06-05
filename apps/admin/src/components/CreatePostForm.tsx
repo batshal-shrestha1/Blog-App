@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import RichTextEditor from './RichTextEditor';
 import Image from "next/image";
+import Link from "next/link";
 
 interface FormErrors {
   title?: string;
@@ -154,7 +155,7 @@ export default function CreatePostForm() {
   return (
     <>
       <div className="mb-6">
-        <a href="/" className="text-indigo-600 hover:underline font-medium">&larr; Back to Homepage</a>
+        <Link href="/" className="text-indigo-600 hover:underline font-medium">&larr; Back to Homepage</Link>
       </div>
       <form onSubmit={handleSubmit} className="space-y-6">
         {successMessage && (
@@ -289,20 +290,46 @@ export default function CreatePostForm() {
           {uploading && <p className="text-sm text-blue-600 mt-1">Uploading...</p>}
           {errors.imageUrl && <p className="mt-1 text-sm text-red-600">{errors.imageUrl}</p>}
           {formData.imageUrl && (
-            <Image
-              src={formData.imageUrl}
-              alt="Preview"
-              className="mt-2 max-w-xs rounded"
-              data-test-id="image-preview"
-              width={400}
-              height={300}
-              onError={(e) => {
-                const target = e.currentTarget as HTMLImageElement;
-                if (target.src !== '/placeholder.png') {
-                  target.src = '/placeholder.png';
+            (() => {
+              try {
+                const url = new URL(formData.imageUrl);
+                if (url.hostname === "res.cloudinary.com") {
+                  return (
+                    <Image
+                      src={formData.imageUrl}
+                      alt="Preview"
+                      className="mt-2 max-w-xs rounded"
+                      data-test-id="image-preview"
+                      width={400}
+                      height={300}
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        if (target.src !== '/placeholder.png') {
+                          target.src = '/placeholder.png';
+                        }
+                      }}
+                    />
+                  );
                 }
-              }}
-            />
+              } catch {}
+              // Fallback to native <img> for other URLs
+              return (
+                <img
+                  src={formData.imageUrl}
+                  alt="Preview"
+                  className="mt-2 max-w-xs rounded"
+                  data-test-id="image-preview"
+                  width={400}
+                  height={300}
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    if (target.src !== '/placeholder.png') {
+                      target.src = '/placeholder.png';
+                    }
+                  }}
+                />
+              );
+            })()
           )}
         </div>
 

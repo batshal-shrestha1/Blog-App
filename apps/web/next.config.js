@@ -26,7 +26,6 @@ const nextConfig = {
       
       
     ],
-    domains: ['example.com', 'res.cloudinary.com'],
   },
 };
 
