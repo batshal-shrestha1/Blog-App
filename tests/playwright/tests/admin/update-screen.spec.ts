@@ -347,34 +347,32 @@ test.describe("ADMIN UPDATE SCREEN", () => {
   );
 
   test(
-    "Cloudinary image upload",
+    "Cloudinary image upload (manual entry)",
     {
       tag: "@a3",
     },
     async ({ userPage }) => {
-      // Intercept actual Cloudinary upload endpoint BEFORE navigation (single backslash in regex)
-      await userPage.route(/cloudinary\.com\/v1_1\/.*\/image\/upload/, async (route) => {
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({
-            url: "https://res.cloudinary.com/ddjxeqzmi/image/upload/v1749215278/blog-images/xlycamx0xwtwnoqn39h6.png"
-          }),
-        });
-      });
-
       await userPage.goto("/posts/create");
 
-      // Simulate file selection
-      const fileInput = userPage.locator('input[type="file"]');
-      await fileInput.setInputFiles('tests/fixtures/sample.jpg');
+      // Manually enter the Cloudinary image URL
+      const cloudinaryUrl = "https://res.cloudinary.com/ddjxeqzmi/image/upload/v1749215278/blog-images/xlycamx0xwtwnoqn39h6.png";
+      await userPage.getByLabel("Image URL").fill(cloudinaryUrl);
 
-      // Assert preview is visible and Image URL is a Cloudinary URL with correct structure
+      // Assert preview is visible and Image URL is correct
       await expect(userPage.getByTestId("image-preview")).toBeVisible();
       const imageUrl = await userPage.getByLabel("Image URL").inputValue();
-      expect(imageUrl).toContain("res.cloudinary.com/ddjxeqzmi/image/upload/");
-      expect(imageUrl).toContain("/blog-images/");
-      expect(imageUrl).toMatch(/\.png$/);
+      expect(imageUrl).toBe(cloudinaryUrl);
+      let previewSrc = await userPage.getByTestId("image-preview").getAttribute("src");
+      expect(decodeURIComponent(previewSrc)).toContain(cloudinaryUrl);
+
+      // Now enter a new Cloudinary image URL and check the preview updates
+      const newCloudinaryUrl = "https://res.cloudinary.com/ddjxeqzmi/image/upload/v1748912607/samples/coffee.jpg";
+      await userPage.getByLabel("Image URL").fill(newCloudinaryUrl);
+      await expect(userPage.getByTestId("image-preview")).toBeVisible();
+      const newImageUrl = await userPage.getByLabel("Image URL").inputValue();
+      expect(newImageUrl).toBe(newCloudinaryUrl);
+      previewSrc = await userPage.getByTestId("image-preview").getAttribute("src");
+      expect(decodeURIComponent(previewSrc)).toContain(newCloudinaryUrl);
     }
   );
 });
