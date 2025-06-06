@@ -346,26 +346,32 @@ test.describe("ADMIN UPDATE SCREEN", () => {
     },
   );
 
-  // test(
-  //   "Cloudinary image upload",
-  //   {
-  //     tag: "@a3",
-  //   },
-  //   async ({ userPage }) => {
+  test(
+    "Cloudinary image upload",
+    {
+      tag: "@a3",
+    },
+    async ({ userPage }) => {
+      // Intercept actual Cloudinary upload endpoint
+      await userPage.route(/cloudinary\\.com\/v1_1\/.*\/image\/upload/, async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ url: "https://res.cloudinary.com/demo/image/upload/sample.jpg" }),
+        });
+      });
 
+      await userPage.goto("/posts/create");
 
-  //     await userPage.goto("/posts/create");
+      // Simulate file selection
+      const fileInput = userPage.locator('input[type="file"]');
+      await fileInput.setInputFiles('tests/fixtures/sample.jpg');
 
-  //     // Simulate file selection
-  //     const fileInput = userPage.locator('input[type="file"]');
-  //     await fileInput.setInputFiles('tests/fixtures/sample.jpg');
-
-  //     // Assert preview is visible and Image URL is a Cloudinary URL
-  //     //await expect(userPage.getByTestId("image-preview")).toBeVisible();
-  //     await expect(userPage.getByLabel("Image URL")).not.toHaveValue("");
-  //     const imageUrl = await userPage.getByLabel("Image URL").inputValue();
-  //     expect(imageUrl).toContain("cloudinary.com");
-  //     expect(imageUrl).toMatch(/\/image\/upload/);
-  //   }
-  // );
+      // Assert preview is visible and Image URL is a Cloudinary URL
+      await expect(userPage.getByTestId("image-preview")).toBeVisible();
+      const imageUrl = await userPage.getByLabel("Image URL").inputValue();
+      expect(imageUrl).toContain("cloudinary.com");
+      expect(imageUrl).toMatch(/\/image\/upload/);
+    }
+  );
 });
