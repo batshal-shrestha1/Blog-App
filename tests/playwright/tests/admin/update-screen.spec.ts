@@ -352,8 +352,8 @@ test.describe("ADMIN UPDATE SCREEN", () => {
       tag: "@a3",
     },
     async ({ userPage }) => {
-      // Intercept actual Cloudinary upload endpoint
-      await userPage.route(/cloudinary\\.com\/v1_1\/.*\/image\/upload/, async (route) => {
+      // Intercept actual Cloudinary upload endpoint BEFORE navigation (single backslash in regex)
+      await userPage.route(/cloudinary\.com\/v1_1\/.*\/image\/upload/, async (route) => {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
