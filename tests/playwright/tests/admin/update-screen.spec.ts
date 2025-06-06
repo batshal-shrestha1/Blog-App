@@ -357,7 +357,9 @@ test.describe("ADMIN UPDATE SCREEN", () => {
         await route.fulfill({
           status: 200,
           contentType: "application/json",
-          body: JSON.stringify({ url: "https://res.cloudinary.com/demo/image/upload/sample.jpg" }),
+          body: JSON.stringify({
+            url: "https://res.cloudinary.com/ddjxeqzmi/image/upload/v1749215278/blog-images/xlycamx0xwtwnoqn39h6.png"
+          }),
         });
       });
 
@@ -367,11 +369,12 @@ test.describe("ADMIN UPDATE SCREEN", () => {
       const fileInput = userPage.locator('input[type="file"]');
       await fileInput.setInputFiles('tests/fixtures/sample.jpg');
 
-      // Assert preview is visible and Image URL is a Cloudinary URL
+      // Assert preview is visible and Image URL is a Cloudinary URL with correct structure
       await expect(userPage.getByTestId("image-preview")).toBeVisible();
       const imageUrl = await userPage.getByLabel("Image URL").inputValue();
-      expect(imageUrl).toContain("cloudinary.com");
-      expect(imageUrl).toMatch(/\/image\/upload/);
+      expect(imageUrl).toContain("res.cloudinary.com/ddjxeqzmi/image/upload/");
+      expect(imageUrl).toContain("/blog-images/");
+      expect(imageUrl).toMatch(/\.png$/);
     }
   );
 });
