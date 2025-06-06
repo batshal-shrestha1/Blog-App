@@ -362,6 +362,7 @@ test.describe("ADMIN UPDATE SCREEN", () => {
 
       // Assert preview is visible and Image URL is a Cloudinary URL
       //await expect(userPage.getByTestId("image-preview")).toBeVisible();
+      await expect(userPage.getByLabel("Image URL")).not.toHaveValue("");
       const imageUrl = await userPage.getByLabel("Image URL").inputValue();
       expect(imageUrl).toContain("cloudinary.com");
       expect(imageUrl).toMatch(/\/image\/upload/);
