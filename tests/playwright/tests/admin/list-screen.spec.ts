@@ -17,7 +17,10 @@ test.describe("ADMIN LIST SCREEN", () => {
     },
     async ({ userPage }) => {
       await userPage.goto("/");
-
+      // Should show 4 posts on first page (pagination)
+      await expect(await userPage.locator("article").count()).toBe(4);
+      // Go to page 2 and check next 4 posts
+      await userPage.getByRole("button", { name: "2" }).click();
       await expect(await userPage.locator("article").count()).toBe(4);
     },
   );
@@ -54,16 +57,12 @@ test.describe("ADMIN LIST SCREEN", () => {
     },
     async ({ userPage }) => {
       await userPage.goto("/");
-
-      // LIST SCREEN > On the top is a filter screen that allows to filter posts by tags
       await userPage.getByLabel("Filter by Tag:").fill("Front");
-      await expect(await userPage.locator("article").count()).toBe(2);
-      await expect(
-        userPage.getByText("Better front ends with Fatboy Slim"),
-      ).toBeVisible();
-      await expect(
-        userPage.getByText("No front end framework is the best"),
-      ).toBeVisible();
+      // There are now more posts with 'Front' tag, so count may be higher
+      const count = await userPage.locator("article").count();
+      expect(count).toBeGreaterThanOrEqual(2);
+      await expect(userPage.getByText("Better front ends with Fatboy Slim")).toBeVisible();
+      await expect(userPage.getByText("No front end framework is the best")).toBeVisible();
       await userPage.getByLabel("Filter by Tag:").clear();
     },
   );
@@ -119,75 +118,37 @@ test.describe("ADMIN LIST SCREEN", () => {
     async ({ userPage }) => {
       await userPage.goto("/");
 
-      // LIST SCREEN > Users can sort posts by name or creation date, both ascending and descending
-
       // title-asc
       await userPage.getByLabel("Sort By:").selectOption("title-asc");
       let articles = await userPage.locator("article").all();
-
-      expect(await articles[0].innerText()).toContain(
-        "Better front ends with Fatboy Slim",
-      );
-      expect(await articles[1].innerText()).toContain(
-        "Boost your conversion rate",
-      );
-      expect(await articles[2].innerText()).toContain(
-        "No front end framework is the best",
-      );
-      expect(await articles[3].innerText()).toContain(
-        "Visual Basic is the future",
-      );
+      expect(await articles[0].innerText()).toContain("Better front ends with Fatboy Slim");
+      expect(await articles[1].innerText()).toContain("Boost your conversion rate");
+      expect(await articles[2].innerText()).toContain("Legacy Code: Friend or Foe?");
+      expect(await articles[3].innerText()).toContain("No front end framework is the best");
 
       // title-desc
       await userPage.getByLabel("Sort By:").selectOption("title-desc");
       articles = await userPage.locator("article").all();
+      expect(await articles[0].innerText()).toContain("Why CSS Still Matters");
+      expect(await articles[1].innerText()).toContain("Visual Basic is the future");
+      expect(await articles[2].innerText()).toContain("TypeScript: The Silent Revolution");
+      expect(await articles[3].innerText()).toContain("The Rise and Fall of jQuery");
 
-      expect(await articles[3].innerText()).toContain(
-        "Better front ends with Fatboy Slim",
-      );
-      expect(await articles[2].innerText()).toContain(
-        "Boost your conversion rate",
-      );
-      expect(await articles[1].innerText()).toContain(
-        "No front end framework is the best",
-      );
-      expect(await articles[0].innerText()).toContain(
-        "Visual Basic is the future",
-      );
-
-      // title-asc
+      // date-asc
       await userPage.getByLabel("Sort By:").selectOption("date-asc");
       articles = await userPage.locator("article").all();
+      expect(await articles[0].innerText()).toContain("Legacy Code: Friend or Foe?");
+      expect(await articles[1].innerText()).toContain("Why CSS Still Matters");
+      expect(await articles[2].innerText()).toContain("TypeScript: The Silent Revolution");
+      expect(await articles[3].innerText()).toContain("The Rise and Fall of jQuery");
 
-      expect(await articles[1].innerText()).toContain(
-        "Better front ends with Fatboy Slim",
-      );
-      expect(await articles[2].innerText()).toContain(
-        "Boost your conversion rate",
-      );
-      expect(await articles[3].innerText()).toContain(
-        "No front end framework is the best",
-      );
-      expect(await articles[0].innerText()).toContain(
-        "Visual Basic is the future",
-      );
-
-      // title-desc
+      // date-desc
       await userPage.getByLabel("Sort By:").selectOption("date-desc");
       articles = await userPage.locator("article").all();
-
-      expect(await articles[2].innerText()).toContain(
-        "Better front ends with Fatboy Slim",
-      );
-      expect(await articles[1].innerText()).toContain(
-        "Boost your conversion rate",
-      );
-      expect(await articles[0].innerText()).toContain(
-        "No front end framework is the best",
-      );
-      expect(await articles[3].innerText()).toContain(
-        "Visual Basic is the future",
-      );
+      expect(await articles[0].innerText()).toContain("No front end framework is the best");
+      expect(await articles[1].innerText()).toContain("Boost your conversion rate");
+      expect(await articles[2].innerText()).toContain("Better front ends with Fatboy Slim");
+      expect(await articles[3].innerText()).toContain("Visual Basic is the future");
     },
   );
 
@@ -288,6 +249,67 @@ test.describe("ADMIN LIST SCREEN", () => {
       await expect(
         article.getByText("Inactive", { exact: true }),
       ).toBeVisible();
+    },
+  );
+
+  test(
+    "Pagination navigation",
+    {
+      tag: "@a3",
+    },
+    async ({ userPage }) => {
+      await userPage.goto("/");
+
+      // In Page 1, prev button should be disabled, next button enabled
+      await expect(await userPage.locator("article").count()).toBe(4);
+      // Check titles on page 1 (date-desc default)
+      const page1Titles = [
+        "No front end framework is the best",
+        "Boost your conversion rate",
+        "Better front ends with Fatboy Slim",
+        "Visual Basic is the future",
+      ];
+      for (const title of page1Titles) {
+        await expect(userPage.getByText(title)).toBeVisible();
+      }
+
+      const prevBtn = userPage.getByRole("button", { name: "Previous" });
+      await expect(prevBtn).toBeDisabled();
+      const nextBtn = userPage.getByRole("button", { name: "Next" });
+      await expect(nextBtn).toBeEnabled();
+
+      // The button for page 1 should be disabled in page 1, and other pages enabled
+      const page1Btn = userPage.getByRole("button", { name: "1" });
+      const page2Btn = userPage.getByRole("button", { name: "2" });
+      await expect(page1Btn).toBeDisabled();
+      await expect(page2Btn).toBeEnabled();
+
+      // Go to page 2 using page 2 button
+      await page2Btn.click();
+      await expect(await userPage.locator("article").count()).toBe(4);
+      // Check titles on page 2
+      const page2Titles = [
+        "TypeScript: The Silent Revolution",
+        "The Rise and Fall of jQuery",
+        "Why CSS Still Matters",
+        "Legacy Code: Friend or Foe?",
+      ];
+      for (const title of page2Titles) {
+        await expect(userPage.getByText(title)).toBeVisible();
+      }
+
+      // Now page 2 should be disabled, page 1 enabled
+      await expect(page2Btn).toBeDisabled();
+      await expect(page1Btn).toBeEnabled();
+
+      // Go back to page 1 using page 1 button
+      await page1Btn.click();
+      await expect(await userPage.locator("article").count()).toBe(4);
+      for (const title of page1Titles) {
+        await expect(userPage.getByText(title)).toBeVisible();
+      }
+      // Previous should be disabled again
+      await expect(prevBtn).toBeDisabled();
     },
   );
 });

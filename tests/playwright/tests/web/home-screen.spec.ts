@@ -31,7 +31,33 @@ test.describe("HOME SCREEN", () => {
     async ({ page }) => {
       await page.goto("/");
 
-      await expect(await page.locator("article").count()).toBe(3);
+      // There are now 6 active posts, paginated 4 per page. Check count and titles on page 1.
+      await expect(await page.locator("article").count()).toBe(4);
+      const page1Titles = [
+        "No front end framework is the best",
+        "Boost your conversion rate",
+        "Better front ends with Fatboy Slim",
+        "The Rise and Fall of jQuery",
+      ];
+      for (const title of page1Titles) {
+        await expect(page.getByText(title)).toBeVisible();
+      }
+
+      // Go to page 2 and check next 2 posts
+      const paginationNav = page.getByRole("navigation", { name: /pagination/i });
+      const page2Link = paginationNav.getByRole("link", { name: "2" });
+      await page2Link.click();
+
+      // Wait for a unique post title from page 2 to appear
+      await expect(page.getByText("TypeScript: The Silent Revolution")).toBeVisible();
+      await expect(await page.locator("article").count()).toBe(2);
+      const page2Titles = [
+        "TypeScript: The Silent Revolution",
+        "Why CSS Still Matters",
+      ];
+      for (const title of page2Titles) {
+        await expect(page.getByText(title)).toBeVisible();
+      }
     },
   );
 
@@ -83,7 +109,7 @@ test.describe("HOME SCREEN", () => {
       // HOME SCREEN > User must see the list of blog post tags, where each tag points to UI showing only posts of that category
 
       await checkItem(page, "Tag / Back-End", "/tags/back-end", 1);
-      await checkItem(page, "Tag / Front-End", "/tags/front-end", 2);
+      await checkItem(page, "Tag / Front-End", "/tags/front-end", 5);
       await checkItem(page, "Tag / Optimisation", "/tags/optimisation", 1);
       await checkItem(page, "Tag / Dev Tools", "/tags/dev-tools", 1);
 
@@ -165,6 +191,60 @@ test.describe("HOME SCREEN", () => {
 
       await page.getByPlaceholder("Search").fill("Fatboy");
       await expect(page).toHaveURL("/search?q=Fatboy");
+    },
+  );
+
+  test(
+    "Pagination navigation",
+    {
+      tag: "@a1",
+    },
+    async ({ page }) => {
+      await page.goto("/");
+
+      // Page 1: prev should be disabled, next enabled, correct titles, correct URL
+      await expect(await page.locator("article").count()).toBe(4);
+      const page1Titles = [
+        "No front end framework is the best",
+        "Boost your conversion rate",
+        "Better front ends with Fatboy Slim",
+        "The Rise and Fall of jQuery",
+      ];
+      for (const title of page1Titles) {
+        await expect(page.getByText(title)).toBeVisible();
+      }
+      const paginationNav = page.getByRole("navigation", { name: /pagination/i });
+      const prevBtn = paginationNav.getByText("Previous");
+      const nextBtn = paginationNav.getByText("Next");
+      await expect(prevBtn).toHaveAttribute("aria-disabled", "true");
+      await expect(nextBtn).not.toHaveAttribute("aria-disabled", "true");
+      await expect(page).toHaveURL("/");
+
+      // Go to page 2 using page 2 link
+      const page2Link = paginationNav.getByRole("link", { name: "2" });
+      await page2Link.click();
+      await expect(page).toHaveURL("/?page=2");
+      await expect(await page.locator("article").count()).toBe(2);
+      const page2Titles = [
+        "TypeScript: The Silent Revolution",
+        "Why CSS Still Matters",
+      ];
+      for (const title of page2Titles) {
+        await expect(page.getByText(title)).toBeVisible();
+      }
+      // Now prev should be enabled, next disabled
+      await expect(prevBtn).not.toHaveAttribute("aria-disabled", "true");
+      await expect(nextBtn).toHaveAttribute("aria-disabled", "true");
+
+      // Go back to page 1 using page 1 link
+      const page1Link = paginationNav.getByRole("link", { name: "1" });
+      await page1Link.click();
+      await expect(page).toHaveURL("/");
+      await expect(await page.locator("article").count()).toBe(4);
+      for (const title of page1Titles) {
+        await expect(page.getByText(title)).toBeVisible();
+      }
+      await expect(prevBtn).toHaveAttribute("aria-disabled", "true");
     },
   );
 });

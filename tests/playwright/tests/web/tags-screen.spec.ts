@@ -22,25 +22,33 @@ test.describe("TAG SCREEN", () => {
   );
 
   test(
-    "Existing Tag with multiple posts",
+    "Existing Tag with multiple posts and pagination",
     {
       tag: "@a1",
     },
     async ({ page }) => {
       await page.goto("/tags/front-end");
 
+      // There are 5 posts with the 'Front-End' tag, paginated 4 per page
+      const page1Titles = [
+        "Better front ends with Fatboy Slim",
+        "No front end framework is the best",
+        "TypeScript: The Silent Revolution",
+        "The Rise and Fall of jQuery",
+      ];
       const articles = await page.locator('[data-test-id^="blog-post-"]');
-      await expect(articles).toHaveCount(2);
+      await expect(articles).toHaveCount(4);
+      for (const title of page1Titles) {
+        await expect(page.getByText(title)).toBeVisible();
+      }
 
-      await expect(page.getByTestId("blog-post-2")).toBeVisible();
-      await expect(
-        page.getByText("Better front ends with Fatboy Slim"),
-      ).toBeVisible();
-
-      await expect(page.getByTestId("blog-post-3")).toBeVisible();
-      await expect(
-        page.getByText("No front end framework is the best"),
-      ).toBeVisible();
+      // Go to page 2 and check for the last post
+      const paginationNav = page.getByRole("navigation", { name: /pagination/i });
+      const page2Link = paginationNav.getByRole("link", { name: "2" });
+      await page2Link.click();
+      await expect(page.getByText("Why CSS Still Matters")).toBeVisible();
+      const articles2 = await page.locator('[data-test-id^="blog-post-"]');
+      await expect(articles2).toHaveCount(1);
     },
   );
 

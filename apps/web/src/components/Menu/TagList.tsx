@@ -11,7 +11,7 @@ export async function TagList({
   selectedTag?: string;
   posts: PostWithLikes[];
 }) {
-  const postTags = await tags(posts);
+  const postTags = (await tags(posts)).sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <LinkList title="Tags">
