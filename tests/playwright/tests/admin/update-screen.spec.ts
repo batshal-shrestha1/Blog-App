@@ -292,4 +292,79 @@ test.describe("ADMIN UPDATE SCREEN", () => {
       ).toBeVisible();
     },
   );
+
+  test(
+    "Quill Rich Text Editor integration",
+    {
+      tag: "@a3",
+    },
+    async ({ userPage }) => {
+      await seed();
+      await userPage.goto("/posts/create");
+
+      // Fill out required fields
+      await userPage.getByLabel("Title").fill("Quill Test Post");
+      await userPage.getByLabel("Category").fill("React");
+      await userPage.getByLabel("Description").fill("Testing Quill");
+      await userPage.getByLabel("Image URL").fill("http://example.com/quill.jpg");
+      await userPage.getByLabel("Tags").fill("Quill");
+
+      // Interact with Quill editor (assume .ql-editor is the contenteditable area)
+      const quillEditor = userPage.locator(".ql-editor");
+      await quillEditor.click();
+      await quillEditor.type("This is ");
+      // Bold
+      await userPage.locator('.ql-bold').click();
+      await quillEditor.type("bold");
+      await userPage.locator('.ql-bold').click();
+      await quillEditor.type(", ");
+      // Italic
+      await userPage.locator('.ql-italic').click();
+      await quillEditor.type("italic");
+      await userPage.locator('.ql-italic').click();
+      await quillEditor.type(", ");
+      // Underline
+      await userPage.locator('.ql-underline').click();
+      await quillEditor.type("underline");
+      await userPage.locator('.ql-underline').click();
+      await quillEditor.type(", ");
+
+      // Save the post
+      await userPage.getByText("Save").click();
+      await expect(userPage.getByText("Post updated successfully")).toBeVisible();
+
+      // Go to update form for the new post
+      await userPage.goto("/post/quill-test-post");
+      // Wait for the Quill editor to be visible
+      const updateQuillEditor = userPage.locator(".ql-editor");
+      await expect(updateQuillEditor).toBeVisible();
+      // Check that the editor contains the expected formatted content
+      const editorHtml = await updateQuillEditor.innerHTML();
+      expect(editorHtml).toContain("<strong>bold</strong>");
+      expect(editorHtml).toContain("<em>italic</em>");
+      expect(editorHtml).toContain("<u>underline</u>");
+    },
+  );
+
+  test(
+    "Cloudinary image upload",
+    {
+      tag: "@a3",
+    },
+    async ({ userPage }) => {
+
+
+      await userPage.goto("/posts/create");
+
+      // Simulate file selection
+      const fileInput = userPage.locator('input[type="file"]');
+      await fileInput.setInputFiles('tests/fixtures/sample.jpg');
+
+      // Assert preview is visible and Image URL is a Cloudinary URL
+      await expect(userPage.getByTestId("image-preview")).toBeVisible();
+      const imageUrl = await userPage.getByLabel("Image URL").inputValue();
+      expect(imageUrl).toContain("cloudinary.com");
+      expect(imageUrl).toMatch(/\/image\/upload/);
+    }
+  );
 });

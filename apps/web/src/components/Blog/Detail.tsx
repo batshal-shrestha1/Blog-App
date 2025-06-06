@@ -2,7 +2,6 @@
 import type { Post, Like } from "@prisma/client";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
-import Image from "next/image";
 import { marked } from "marked";
 import { HeartIcon } from "@heroicons/react/24/solid";
 
@@ -78,13 +77,20 @@ export function BlogDetail({ post }: { post: PostWithLikes }) {
           ))}
         </span>
       </div>
-      <Image
+      {/* Use <img> for fallback support */}
+      <img
         src={post.imageUrl}
         alt={post.title}
         width={800}
         height={400}
         className="rounded-lg object-cover w-full max-h-[400px] mb-6"
-        priority
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          if (!target.src.endsWith('/placeholder.png')) {
+            target.src = '/placeholder.png';
+          }
+        }}
+        data-test-id="post-image"
       />
       <div
         data-test-id={`content-markdown`}
